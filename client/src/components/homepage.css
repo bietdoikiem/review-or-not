@@ -1,0 +1,30 @@
+
+.logo-text {
+    font-size: 3em;
+}
+
+#search-section {
+    width: auto;
+}
+
+.search-bar {
+    position: relative;
+    width: 49.3%;
+    margin: 0 auto;
+}
+
+.search-bar .search-example {
+    display: block;
+    float: left;
+}
+
+.search-example p {
+    font-size: 0.875em;
+}
+
+#product-search {
+    width: 100%;
+    height: 41px;
+    border: 1px solid #FFBE85;
+    border-radius: 5px;
+}
