@@ -1,22 +1,20 @@
 body {
     font-family: 'Athiti', sans-serif;
+    background: #fbfbfb;
 }
 
 #head {
     height: 50px;
     background: #FFBE85;
-    margin-bottom:100px;
 }
 
-#container {
-    padding-left: 50px;
-    padding-right: 50px;
+#product_infor {
+    margin-top: 50px;
 }
 
 #img_product {
     max-width: 100%;
     height: 310px;
-    /* max-height: 100%; */
     float: right;
 }
 
@@ -38,8 +36,9 @@ img#guarantee {
 #text_guarantee {
     text-transform: capitalize;
     font-size: .875rem;
-    margin: 0 20px 0 5px;
+    margin: 0 0 0 5px;
 }
+
 #btn_buy {
     height:50px;
     border: #ee4d2d;
@@ -50,4 +49,10 @@ img#guarantee {
     border-radius: 5%;
     margin-top: 60px;
     cursor: pointer;
+}
+
+#normal_text {
+   text-decoration: none; 
+   background-color: none;
+   color: black;
 }
