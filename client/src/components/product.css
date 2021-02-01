@@ -1,0 +1,21 @@
+.table-container {
+    width: 66.25% !important;
+    margin: 0 auto;
+    padding: 45px 122px;
+}
+
+.product-cell {
+    display: flex!important;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 22px;
+}
+
+.product-image {
+    width: 100px;
+    height: 100px;
+}
+
+.product-name {
+    font-size: 1em;
+}

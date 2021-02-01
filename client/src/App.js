@@ -1,6 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import Homepage from './components/homepage'
+import Product from './components/product'
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       </header>
       <main>
         <Homepage/>
+        <Product/>
       </main>
     </div>
   );
