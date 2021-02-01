@@ -21,7 +21,7 @@ export default function Homepage() {
     <div>
       <section id="app-name-section">
           <div id="logo">
-                <p className="logo-text">Review or Not</p>
+                <p className="logo-text">ReviewOrNot</p>
           </div>
       </section>
       <section id="search-section">
