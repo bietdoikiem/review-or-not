@@ -1,5 +1,5 @@
 // import './App.css';
-import ProductDetails from './Components/ProductDetails.js'
+import ProductDetails from './components/productDetails.js'
 
 function App() {
   return (
