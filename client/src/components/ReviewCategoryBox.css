@@ -39,15 +39,22 @@
 }
 /* css for a-tag (on hover) */
 .single-nav li a:hover {
+    background-color: #fdcea4;
+    cursor:pointer;
+
+}
+.single-nav li .active:hover {
     background-color: #FFBE85;
     cursor:pointer;
 
 }
+/* active */
 .active {
     background-color: #FFBE85;
     text-decoration: underline !important;
     text-decoration-color: #F57200 !important;
     text-decoration-thickness: 2.5px !important;
+    text-decoration-skip-ink: none;
 }
 
 /* Over 960px desktop screen */
@@ -71,7 +78,7 @@
 
 .review-box-content::-webkit-scrollbar-track
 {
-	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 	background-color: #F5F5F5;
 }
 
