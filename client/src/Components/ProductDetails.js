@@ -43,7 +43,7 @@ export default function ProductDetails() {
               <Grid item lg={7} sm={7}>
                 <p id="title">Men Summer Retro Short Sleeve Loose Fit Shirt</p>
                 <p id="price">$10.59</p>
-                <div style={{ paddingTop: "30px" }}>
+                <div style={{ paddingTop: "50px" }}>
                   <a
                     id="normal_text"
                     href="https://help.shopee.sg/s/article/What-is-Shopee-Guarantee-1542975959578"
