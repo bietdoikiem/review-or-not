@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './ReviewCategoryBox.css';
-import { Container } from '@material-ui/core';
 import CommentCard from './CommentCard';
 
 
@@ -118,7 +117,6 @@ const ReviewCategoryBox = (props) => {
 
     return (
 			<React.Fragment>
-				<Container size="sm">
 					<div className="review-box">
 						<nav id="single-nav" className="single-nav menu" role="navigation">
 							<ul>
@@ -155,7 +153,6 @@ const ReviewCategoryBox = (props) => {
                         }
                         </div>
 					</div>
-				</Container>
 			</React.Fragment>
 		);
 }
