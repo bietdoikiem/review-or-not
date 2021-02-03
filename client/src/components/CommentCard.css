@@ -1,0 +1,8 @@
+.comment-card {
+    max-width: 954px;
+    max-height: 200px;
+    height: 200px;
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0,0,0,.09);
+    padding: 1rem 0 1rem 1.25rem;
+}
