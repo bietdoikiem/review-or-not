@@ -1,0 +1,101 @@
+@media only screen and (min-width: 761px){
+    .layout-align {
+      width: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 30px 0 30px 0;
+    }
+}
+
+@media only screen and (max-width: 760px){
+    .layout-align{
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 25px 0 25px 0;
+    }
+}
+/* Just for very small screen sizes */
+@media only screen and (max-width: 355px){
+    .layout-align{
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0 10px 0;
+      transform: scale(0.8);
+    }
+}
+
+/* CSS for 1st Meter */ 
+
+#score-meter-1{
+    width: 300px;
+    height: 150px;
+    border-top-left-radius: 360px;
+    border-top-right-radius: 360px;
+    overflow: hidden;
+    position: relative;
+  }
+  #scorer-1-inner-div{
+    position: absolute;
+    left: 20%;
+    top: 40%;
+    width: 60%;
+    height: 60%;
+    border-top-left-radius: 360px;
+    border-top-right-radius: 360px;
+    background-color: #ffffff;
+    z-index: 2;
+  }
+  #scorer-1-inner-div-2{
+    position: absolute;
+    left: 0%;
+    top: 0%;
+    z-index: 4;
+    width: 100%;
+    height: 100%;
+    border-top-left-radius: 360px;
+    border-top-right-radius: 360px;
+    background-color: #ff1a1a;
+    transform-origin: bottom center;
+    transform: rotate(-130deg);
+    z-index: 0;
+  }
+  #scorer-1-inner-div-3{
+    position: absolute;
+    right: 0%;
+    top: 0%;
+    z-index: 4;
+    width: 100%;
+    height: 100%;
+    border-top-left-radius: 360px;
+    border-top-right-radius: 360px;
+    background-color: #00b300;
+    transform-origin: bottom center;
+    transform: rotate(130deg);
+    z-index: 0
+  }
+  #scorer-1-inner-div-4{
+    position: absolute;
+    left: 50px;
+    top: -2px;
+    width: 0;
+    height: 0;
+    border-left: 100px solid transparent;
+    border-right: 100px solid transparent;
+    border-bottom: 140px solid #FFCA3D;
+    transform: rotate(180deg);
+  }
+  #scorer-1-inner-div-5{
+    position: absolute;
+    left: 45%;
+    top: 80%;
+    width: 10%;
+    height: 20%;
+    border-radius: 50%;
+    background-color: #000000;
+    z-index: 2;
+  }

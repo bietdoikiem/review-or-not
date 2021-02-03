@@ -151,8 +151,7 @@ const ReviewCategoryBox = (props) => {
                                         <li><b>Comment:</b> {c.content}</li>
                                     </CommentCard>
                                 )
-                            })
-                            : 'undefined'
+                            }) : 'undefined'
                         }
                         </div>
 					</div>
