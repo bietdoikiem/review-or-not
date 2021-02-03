@@ -8,7 +8,7 @@ function App() {
 		<div className="App">
 			<h1>This is website for ReviewOrNot</h1>
 			<Container size="sm">
-				<SentimentGauge score={0.5} duration={1} /> {/* Input score in range [-1, 1], input duration is in second*/}
+				<SentimentGauge score={0.6} duration={1} /> {/* Input score in range [-1, 1], input duration is in second*/}
         <br/>
 				<ReviewCategoryBox />
 			</Container>
