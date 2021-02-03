@@ -1,7 +1,21 @@
 .table-container {
     width: 66.25% !important;
-    margin: 0 auto;
+    margin: 70px auto;
     padding: 45px 122px;
+    border: 1px solid #FFE9D6;
+    box-shadow: none !important;
+}
+
+.overall-feedback {
+    font-weight: 500!important;
+}
+
+#product-table {
+    min-width: 780px!important;
+}
+
+.table-head {
+    font-size: 1.25em !important;
 }
 
 .product-cell {
