@@ -1,0 +1,35 @@
+.table-container {
+    width: 66.25% !important;
+    margin: 70px auto;
+    padding: 45px 122px;
+    border: 1px solid #FFE9D6;
+    box-shadow: none !important;
+}
+
+.overall-feedback {
+    font-weight: 500!important;
+}
+
+#product-table {
+    min-width: 780px!important;
+}
+
+.table-head {
+    font-size: 1.25em !important;
+}
+
+.product-cell {
+    display: flex!important;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 22px;
+}
+
+.product-image {
+    width: 100px;
+    height: 100px;
+}
+
+.product-name {
+    font-size: 1em;
+}
