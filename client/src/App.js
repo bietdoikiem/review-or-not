@@ -1,22 +1,22 @@
-
-import './App.css';
-import ReviewCategoryBox from './components/ReviewCategoryBox';
-import SentimentGauge from './components/SentimentGauge';
-import { Container } from '@material-ui/core';
+import "./App.css";
+import { Container } from "@material-ui/core";
+import Homepage from "./components/homepage";
+import Product from './components/product'
+import ProductDetailsPage from './pages/productDetailsPage'
 
 function App() {
   return (
-		<div className="App">
-			<h1>This is website for ReviewOrNot</h1>
-			<Container size="sm">
-				<SentimentGauge score={0.6} duration={1} /> {/* Input score in range [-1, 1], input duration is in second*/}
-        <br/>
-				<ReviewCategoryBox />
-			</Container>
-			<br />
-			<br />
-		</div>
-	);
+    <div className="App">
+      <Container maxWidth="md">
+        <header>
+          
+        </header>
+        <main>
+          <ProductDetailsPage/>
+        </main>
+      </Container>
+    </div>
+  );
 }
 
 export default App;

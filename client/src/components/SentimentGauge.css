@@ -1,6 +1,5 @@
 .score-meter-wrapper {
-    width: 300px;
-    margin: 0;
+  position: relative;
 }
 
 .score-meter-info {
@@ -17,6 +16,7 @@
     border-top-right-radius: 360px;
     overflow: hidden;
     position: relative;
+    margin: 0 auto;
   }
   #scorer-1-inner-div{
     position: absolute;
