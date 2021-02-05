@@ -64,7 +64,7 @@ const SentimentGauge = (props) => {
                 return `N/A`
         }
     }
-    console.log(props.score)
+    // console.log(props.score)
 	return (
         <div className="score-meter-wrapper">
 			<div id="score-meter-1" class="layout-align">

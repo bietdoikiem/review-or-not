@@ -49,7 +49,7 @@ const ReviewCategoryBox = (props) => {
     }, [commentContent]);
 
     /* Fetch list of comments by product's id (For ex: ID 1)*/
-    useEffect(async () => {
+    useEffect(() => {
         setCommentContent(
             {
                 'product_id': '1',
