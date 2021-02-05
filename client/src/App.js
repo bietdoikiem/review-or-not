@@ -3,19 +3,33 @@ import { Container } from "@material-ui/core";
 import Homepage from "./components/homepage";
 import Product from './components/product'
 import ProductDetailsPage from './pages/productDetailsPage'
+import {
+  createMuiTheme,
+  makeStyles,
+  ThemeProvider,
+} from "@material-ui/core/styles";
+
+const theme = createMuiTheme({
+  typography: {
+    fontFamily: ["Athiti"].join(","),
+  },
+});
 
 function App() {
   return (
+    <ThemeProvider theme={theme}>
     <div className="App">
-      <Container maxWidth="md">
-        <header>
+              <header id="head">
           
-        </header>
+          </header>
+      <Container maxWidth="md">
+
         <main>
           <ProductDetailsPage/>
         </main>
       </Container>
     </div>
+    </ThemeProvider>
   );
 }
 

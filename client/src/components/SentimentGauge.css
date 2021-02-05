@@ -7,6 +7,13 @@
     padding-top: 1.2rem;
 }
 
+.score-meter-name {
+  text-align: center;
+}
+
+.score-meter-name p {
+  font-size: 1.5em;
+}
 /* CSS for 1st Meter */ 
 
 #score-meter-1{

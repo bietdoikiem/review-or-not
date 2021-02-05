@@ -67,6 +67,9 @@ const SentimentGauge = (props) => {
     console.log(props.score)
 	return (
         <div className="score-meter-wrapper">
+            <div className="score-meter-name">
+                <p>Customer Sentiment Analytics</p>
+            </div>
 			<div id="score-meter-1" class="layout-align">
 				<div id="scorer-1-inner-div">
 					<div id="scorer-1-inner-div-5">
