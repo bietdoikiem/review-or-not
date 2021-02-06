@@ -5,7 +5,7 @@ import ReviewCategoryBox from "../components/ReviewCategoryBox";
 import ProductBox from "../components/productBox"
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Link from "@material-ui/core/Link";
-
+import RatingDetails from "../components/RatingDetails";
 
 import "./productDetailsPage.css"
 
@@ -42,6 +42,9 @@ export default class ProductDetailsPage extends React.Component {
             </section>
             <section className="product-section">
                 <SentimentGauge score={0.6} duration={1} /> {/* Input score in range [-1, 1], input duration is in second */}
+                <br/>
+                <RatingDetails />
+                <br/>
             </section>
             <section className="product-section">
                 <ReviewCategoryBox style={{margin: "0 auto"}} />
