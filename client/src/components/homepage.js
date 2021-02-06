@@ -18,7 +18,7 @@ function SearchBar() {
 // Export Homepage
 export default function Homepage() {
   return (
-    <div>
+    <div id="homepage">
       <section id="app-name-section">
           <div id="logo">
                 <p className="logo-text">ReviewOrNot</p>
