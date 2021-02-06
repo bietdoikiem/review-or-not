@@ -224,7 +224,7 @@ const RatingDetails = (props) => {
 									<span style={{ fontSize: "42px" }}>{getAvgAndTotalRatings(mapRating).avg}</span>
 								</TotalWrapper>
 								<NumOfRatingWrapper>
-									<span style={{ fontSize: "12px" }}>
+									<span style={{ fontSize: "14px" }}>
 										{" "}
 										{`(${getAvgAndTotalRatings(mapRating).total} ratings)`}
 									</span>
