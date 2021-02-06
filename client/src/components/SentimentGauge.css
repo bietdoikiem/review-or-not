@@ -1,6 +1,5 @@
 .score-meter-wrapper {
-    width: 300px;
-    margin: 0;
+  position: relative;
 }
 
 .score-meter-info {
@@ -8,6 +7,13 @@
     padding-top: 1.2rem;
 }
 
+.score-meter-name {
+  text-align: center;
+}
+
+.score-meter-name p {
+  font-size: 1.5em;
+}
 /* CSS for 1st Meter */ 
 
 #score-meter-1{
@@ -17,6 +23,7 @@
     border-top-right-radius: 360px;
     overflow: hidden;
     position: relative;
+    margin: 0 auto;
   }
   #scorer-1-inner-div{
     position: absolute;

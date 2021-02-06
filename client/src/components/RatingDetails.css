@@ -1,0 +1,14 @@
+.icon-rating-solid {
+    fill: #F57200;
+    margin-right: .025rem;
+    width: 13px;
+    height: 13px;
+}
+
+.icon-rating {
+    color: #F57200;
+    margin-right: .025rem;
+    width: 13px;
+    height: 13px;
+    stroke: currentColor;
+}

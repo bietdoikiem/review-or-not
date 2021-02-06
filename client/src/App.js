@@ -1,22 +1,36 @@
+import "./App.css";
+import { Container } from "@material-ui/core";
+import Homepage from "./components/homepage";
+import Product from './components/product'
+import ProductDetailsPage from './pages/productDetailsPage'
+import {
+  createMuiTheme,
+  makeStyles,
+  ThemeProvider,
+} from "@material-ui/core/styles";
 
-import './App.css';
-import ReviewCategoryBox from './components/ReviewCategoryBox';
-import SentimentGauge from './components/SentimentGauge';
-import { Container } from '@material-ui/core';
+const theme = createMuiTheme({
+  typography: {
+    fontFamily: ["Athiti"].join(","),
+  },
+});
 
 function App() {
   return (
-		<div className="App">
-			<h1>This is website for ReviewOrNot</h1>
-			<Container size="sm">
-				<SentimentGauge score={0.6} duration={1} /> {/* Input score in range [-1, 1], input duration is in second*/}
-        <br/>
-				<ReviewCategoryBox />
-			</Container>
-			<br />
-			<br />
-		</div>
-	);
+    <ThemeProvider theme={theme}>
+    <div className="App">
+              <header id="head">
+          
+          </header>
+      <Container maxWidth="md">
+
+        <main>
+          <ProductDetailsPage/>
+        </main>
+      </Container>
+    </div>
+    </ThemeProvider>
+  );
 }
 
 export default App;
