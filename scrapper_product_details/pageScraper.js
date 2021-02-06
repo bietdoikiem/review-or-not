@@ -1,7 +1,8 @@
 const fs = require("fs");
 
 const url =
-  "https://shopee.sg/Baby-Educational-Soft-Rubber-Hand-Grasp-Rolling-Ball-Crib-Mobile-Bell-Toy-i.87219179.2128867533";
+  "https://shopee.sg/Moet-Chandon-Imperial-Brut-750ml-(Without-Box)-i.6492885.685457461";
+  
 const scraperObject = {
   url: url,
     async scraper(browser) {
@@ -26,7 +27,7 @@ const scraperObject = {
           dataObj["imageUrl"] = await page.$eval("._39-Tsj > div", (div) =>
             div
               .getAttribute("style")
-              .substring(23, div.getAttribute("style").indexOf(")")-1)
+              .substring(23, div.getAttribute("style").indexOf(")") - 1)
           );
 
           // Rating - 2 conditions to check if there are ratings or not
@@ -59,7 +60,11 @@ const scraperObject = {
         });
       }
       await sleep(5000);
-      
+
+      // Click the "I AM OVER 18" if the dialog shows in the page
+      if ((await page.$(".shopee-alert-popup__message")) !== null) 
+        await page.click(".shopee-alert-popup__btn");
+
       // Store data scraped into a variable
       let currentPageData = await pagePromise(url);
       scrapedData.push(currentPageData);
