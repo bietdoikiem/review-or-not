@@ -9,19 +9,18 @@ export default function ProductBox(props) {
       <React.Fragment>
           {/* Start the Product Infor */}
           <CssBaseline />
-          <div className="product_infor">
-              <Grid lg={12} container>
+              <Grid lg={12} container style={{padding: "20px"}}>
                 {/* Start the image */}
-                <Grid item lg={4} sm={12}>
+                <Grid item lg={4} sm={4} id="img_product">
                   <img
-                    id="img_product"
+                    
                     src={props.product.urlPicture}
                     alt="product pic"
                   ></img>
                 </Grid>
                 {/* End the image */}
                 {/* Start the infor */}
-                <Grid item lg={8} sm={12}>
+                <Grid item lg={8} sm={8}>
                   <p id="title">{props.product.title}</p>
                   <p id="price">{props.product.price}</p>
                   <div style={{ paddingTop: "50px" }}>
@@ -46,7 +45,6 @@ export default function ProductBox(props) {
                 {/* End the infor */}
 
               </Grid>
-          </div>
           {/* End the Product Infor */}
       </React.Fragment>
     );

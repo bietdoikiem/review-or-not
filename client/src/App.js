@@ -22,10 +22,9 @@ function App() {
               <header id="head">
           
           </header>
-      <Container maxWidth="md">
-
+      <Container maxWidth="lg">
         <main>
-          <ProductDetailsPage/>
+          <Homepage/>
         </main>
       </Container>
     </div>
