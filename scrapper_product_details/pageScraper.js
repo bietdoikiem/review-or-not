@@ -2,7 +2,7 @@ const fs = require("fs");
 
 const url =
   "https://shopee.sg/Moet-Chandon-Imperial-Brut-750ml-(Without-Box)-i.6492885.685457461";
-  
+
 const scraperObject = {
   url: url,
     async scraper(browser) {
