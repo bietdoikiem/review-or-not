@@ -13,7 +13,7 @@ function wait (ms) {
 }
 
 const url =
-  "https://shopee.sg/Rigorer-Pro-Performance-Short-Sleeve-Compression-T-Shirt-SC0602-(Sports-Top-Gym-Fitness-Exercise-Cycling-Running)-i.106407924.4046257393";
+  "https://shopee.sg/Giordano-Men-Oxford-Embroidery-Frog-Shirt-i.309959293.4361425059";
 
 
 
@@ -59,11 +59,21 @@ const url =
 
       let trackingPage = 1;
       let nextPage = 1;
+      // Condition checking if there are reviews for the product
       while (trackingPage == nextPage && pages[0] != undefined){
-        let items = document.getElementsByClassName("shopee-product-rating__content")
+
+
+        // Scrape review's star
+        let reviewStar = document.getElementsByClassName("shopee-product-rating__rating")
+      
+
+        // Scrape review's content
+        let items = document.getElementsByClassName("shopee-product-rating")
         for (let elem of items) {
           let review = {} // Review object
-          review['content'] = elem.innerText // Add review content
+          let userReview =  elem.getElementsByClassName("shopee-product-rating__main")[0]
+          review['content'] = userReview.getElementsByClassName("shopee-product-rating__content")[0].innerText // Add review content
+          review['rating'] = userReview.getElementsByClassName("icon-rating-solid--active").length
           results.push(review); // Add to the result list
         }
 
