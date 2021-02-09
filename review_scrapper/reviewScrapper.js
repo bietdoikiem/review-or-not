@@ -61,17 +61,13 @@ const url =
       let nextPage = 1;
       // Condition checking if there are reviews for the product
       while (trackingPage == nextPage && pages[0] != undefined){
-
-
-        // Scrape review's star
-        let reviewStar = document.getElementsByClassName("shopee-product-rating__rating")
       
-
         // Scrape review's content
         let items = document.getElementsByClassName("shopee-product-rating")
         for (let elem of items) {
           let review = {} // Review object
           let userReview =  elem.getElementsByClassName("shopee-product-rating__main")[0]
+          review['author'] = userReview.getElementsByClassName("shopee-product-rating__author-name")[0].innerText
           review['content'] = userReview.getElementsByClassName("shopee-product-rating__content")[0].innerText // Add review content
           review['rating'] = userReview.getElementsByClassName("icon-rating-solid--active").length
           results.push(review); // Add to the result list
