@@ -13,7 +13,7 @@ function wait (ms) {
 }
 
 const url =
-  "https://shopee.sg/Giordano-Men-Oxford-Embroidery-Frog-Shirt-i.309959293.4361425059";
+  "https://shopee.sg/Herschel-Anchor-Sleeve-for-13-inch-Macbook-Raven-Crosshatch-i.48788084.1731269343";
 
 
 
@@ -67,9 +67,14 @@ const url =
         for (let elem of items) {
           let review = {} // Review object
           let userReview =  elem.getElementsByClassName("shopee-product-rating__main")[0]
-          review['author'] = userReview.getElementsByClassName("shopee-product-rating__author-name")[0].innerText
+          review['author'] = userReview.getElementsByClassName("shopee-product-rating__author-name")[0].innerText // Add review author
+          
+          //Check variation
+          let reviewVariation = userReview.getElementsByClassName("shopee-product-rating__variation")[0]
+          if ( reviewVariation != undefined)
+              review['variation'] = reviewVariation.innerText.replace("Variation: ", "") // Add review variation
           review['content'] = userReview.getElementsByClassName("shopee-product-rating__content")[0].innerText // Add review content
-          review['rating'] = userReview.getElementsByClassName("icon-rating-solid--active").length
+          review['rating'] = userReview.getElementsByClassName("icon-rating-solid--active").length // Add review rating
           results.push(review); // Add to the result list
         }
 
