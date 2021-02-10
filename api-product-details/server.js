@@ -3,7 +3,7 @@ const app = express();
 const port = 3000;
 
 // Import puppeteer function for getting data
-const getProductDetails = require("./search");
+const getProductDetails = require("./getProductDetails");
 
 // Catches requests made to localhost:3000/search
 app.get("/product", (request, response) => {
