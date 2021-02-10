@@ -7,6 +7,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
+
 const keyword = require('./scraper_keyword/index');
 
 if (process.env.NODE_ENV === 'production') {
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
         message: "Welcome to ReviewOrNot's API"
     })
 })
+
 
 app.use("/api", keyword);
  
