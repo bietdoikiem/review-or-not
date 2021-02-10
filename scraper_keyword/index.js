@@ -58,7 +58,7 @@ const getProductsHandler = async ({url, commands, nrOfPages}) => {
     }
 }
 
-router.post('/product/productReviews', async (req, res) => {
+router.post('/product/product-reviews', async (req, res) => {
     req.setTimeout(timeout);
     try {
         console.log(req.body);

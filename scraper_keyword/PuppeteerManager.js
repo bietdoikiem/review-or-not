@@ -28,7 +28,7 @@ class PuppeteerManager {
 		const browser = await puppeteer.launch({
 			headless: false,
 			args: ["--no-sandbox", "--disable-gpu", "--start-maximized"],
-		
+			defaultViewport: null
 		});
 		let page = await browser.newPage();
 		// await this.preparePageForTests(page);
@@ -42,8 +42,6 @@ class PuppeteerManager {
 		await page.goto(this.url, { waitUntil: "networkidle2" }, function() {
 			console.log(this.url)
 		});
-
-		// await page.screenshot({ path: "./screenshot2.jpg", type: "jpeg", fullPage: true });
 
 		let commandIndex = 0;
 		const timeout = 5000;
@@ -66,7 +64,6 @@ class PuppeteerManager {
 						postCount = await this.getCount(page, commands[commandIndex].locatorCss);
 						console.log(`postcount:`,preCount)
 					} while (postCount > preCount);
-	
 					await this.executeCommand(frames[0], commands[commandIndex]);
 					await this.sleep(1000);
 					// console.log(
@@ -139,8 +136,13 @@ class PuppeteerManager {
 				try {
 					let products = await frame
 						.evaluate((command) => {
-							const convertStar = async (div) => {
-
+							const convertStar = async (ratingList) => {
+								let actualRating = 0;
+								for (const rating of ratingList) {
+									nmlRating = rating / 100;
+									actualRating += nmlRating;
+								}
+								return parseFloat(actualRating.toFixed(1));
 							}
 							try {
 								let parsedItems = [];
@@ -157,15 +159,16 @@ class PuppeteerManager {
 										let re = /(\d+\.\d+)|(\d+)/g;
 										let matched = await width.match(re);
 										if(matched.length > 0) {
-											ratingList.push(matched[0]);
+											ratingList.push(parseFloat(matched[0]));
 										}
 									})
+									let actualRating = await convertStar(ratingList);
 									let product = {
 										productTitle: productTitle,
 										price: parseFloat(price.replace(/,/g, '')),
 										link: link,
 										imageUrl: imageUrl,
-										ratings: ratingList
+										ratings: actualRating
 									};
 									// console.log(product);
 									parsedItems.push(product);
