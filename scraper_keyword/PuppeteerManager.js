@@ -7,6 +7,7 @@ class PuppeteerManager {
 		this.nrOfPages = nrOfPages;
 		this.allProducts = [];
 		this.productDetails = {};
+		this.productReviews = [];
 	}
 
 	async runPuppeteer() {
@@ -27,7 +28,7 @@ class PuppeteerManager {
 		const browser = await puppeteer.launch({
 			headless: false,
 			args: ["--no-sandbox", "--disable-gpu", "--start-maximized"],
-			defaultViewport: null,
+		
 		});
 		let page = await browser.newPage();
 		// await this.preparePageForTests(page);
@@ -38,43 +39,86 @@ class PuppeteerManager {
 				});
 			}
 		});
+		await page.goto(this.url, { waitUntil: "networkidle2" }, function() {
+			console.log(this.url)
+		});
 
-		await page.goto(this.url, { waitUntil: "networkidle2" });
-		const delay = 3000;
-		let preCount = 0;
-		let postCount = 0;
 		// await page.screenshot({ path: "./screenshot2.jpg", type: "jpeg", fullPage: true });
-		let timeout = 5000;
+
 		let commandIndex = 0;
-		while (commandIndex < commands.length) {
-			try {
-				console.log(`command ${commandIndex + 1}/${commands.length}`);
-				let frames = await page.frames();
-				await frames[0].waitForSelector(commands[commandIndex].locatorCss, { timeout: timeout });
-
-				/* Scroll event */
-				do {
-					preCount = await this.getCount(page, commands[commandIndex].locatorCss);
-					console.log(`precount:`,preCount)
-					await this.scrollDown(page, commands[commandIndex].locatorCss);
-					await page.waitFor(delay);
-					postCount = await this.getCount(page, commands[commandIndex].locatorCss);
-					console.log(`postcount:`,preCount)
-				} while (postCount > preCount);
-
-				await this.executeCommand(frames[0], commands[commandIndex]);
-				await this.sleep(1000);
-				// console.log(
-				// 	"executing with locatorCss",
-				// 	commands[commandIndex].locatorCss,
-				// 	"and command type",
-				// 	commands[commandIndex].type
-				// ); /* test */
-			} catch (error) {
-				console.log(error);
-				break;
+		const timeout = 5000;
+		let preCount = 0;
+		let postCount = 0; 
+		const delay = 3000;
+		if (commands[0].type == "getItems") {
+			while (commandIndex < commands.length) {
+				try {
+					console.log(`command ${commandIndex + 1}/${commands.length}`);
+					let frames = await page.frames();
+					await frames[0].waitForSelector(commands[commandIndex].locatorCss, { timeout: timeout });
+	
+					/* Scroll event */
+					do {
+						preCount = await this.getCount(page, commands[commandIndex].locatorCss);
+						console.log(`precount:`,preCount)
+						await this.scrollDown(page, commands[commandIndex].locatorCss);
+						await page.waitFor(delay);
+						postCount = await this.getCount(page, commands[commandIndex].locatorCss);
+						console.log(`postcount:`,preCount)
+					} while (postCount > preCount);
+	
+					await this.executeCommand(frames[0], commands[commandIndex]);
+					await this.sleep(1000);
+					// console.log(
+					// 	"executing with locatorCss",
+					// 	commands[commandIndex].locatorCss,
+					// 	"and command type",
+					// 	commands[commandIndex].type
+					// ); /* test */
+				} catch (error) {
+					console.log(error);
+					break;
+				}
+				commandIndex++;
 			}
-			commandIndex++;
+		} else {
+			while (commandIndex < commands.length) {
+				try {
+					console.log(`command ${commandIndex + 1}/${commands.length}`);
+					let frames = await page.frames();
+	
+			/* Scroll event */
+			
+			const bodyHandle = await page.$("body");
+			const { height } = await bodyHandle.boundingBox();
+			await bodyHandle.dispose();
+	
+			const viewportHeight = page.viewport().height;
+			let viewportIncr = 0;
+			while (viewportIncr + viewportHeight < height) {
+			  await page.evaluate((_viewportHeight) => {
+				window.scrollBy(0, _viewportHeight);
+			  }, viewportHeight);
+			  await this.sleep(500);
+			  viewportIncr = viewportIncr + viewportHeight;
+			}
+	
+			// await frames[0].waitForSelector(commands[commandIndex].locatorCss, { timeout: timeout });
+			await this.sleep(500);
+	
+			await this.executeCommand(frames[0], commands[commandIndex]);
+			// console.log(
+			// 	"executing with locatorCss",
+			// 	commands[commandIndex].locatorCss,
+			// 	"and command type",
+			// 	commands[commandIndex].type
+			// ); /* test */
+		  } catch (error) {
+			console.log(error);
+			break;
+		  }
+		  commandIndex++;
+			}	
 		}
 		console.log("done");
 		// await browser.close();
@@ -141,7 +185,81 @@ class PuppeteerManager {
 					return false;
 				}
 			case "getItemDetails":
-				break;
+				try {
+					this.productReviews = await frame.evaluate(async (command) => {
+					  console.log(command.locatorCss);
+		  
+					  try {
+						function wait(ms) {
+						  return new Promise((resolve) =>
+							setTimeout(() => resolve(), ms)
+						  );
+						}
+						let results = [];
+		  
+						let pages = document.getElementsByClassName(
+						  "shopee-icon-button--right"
+						);
+		  
+						let trackingPage = 1;
+						let nextPage = 1;
+						// Condition checking if there are reviews for the product
+						while (trackingPage == nextPage && pages[0] != undefined) {
+						  // Scrape review's content
+						  let items = document.querySelectorAll(command.locatorCss);
+						  for (let elem of items) {
+							let review = {}; // Review object
+							let userReview = elem.getElementsByClassName(
+							  "shopee-product-rating__main"
+							)[0];
+							review["author"] = userReview.getElementsByClassName(
+							  "shopee-product-rating__author-name"
+							)[0].innerText; // Add review author
+		  
+							//Check variation
+							let reviewVariation = userReview.getElementsByClassName(
+							  "shopee-product-rating__variation"
+							)[0];
+							if (reviewVariation != undefined)
+							  review["variation"] = reviewVariation.innerText.replace(
+								"Variation: ",
+								""
+							  ); // Add review variation
+							review["content"] = userReview.getElementsByClassName(
+							  "shopee-product-rating__content"
+							)[0].innerText; // Add review content
+							review["rating"] = userReview.getElementsByClassName(
+							  "icon-rating-solid--active"
+							).length; // Add review rating
+							results.push(review); // Add to the result list
+						  }
+		  
+						  await pages[0].click();
+						  trackingPage = parseInt(
+							document.getElementsByClassName(
+							  "shopee-button-solid shopee-button-solid--primary"
+							)[0].innerText
+						  );
+						  nextPage++;
+						  await wait(1000);
+						  pages = null;
+						  pages = document.getElementsByClassName(
+							"shopee-icon-button--right"
+						  );
+						}
+		  
+						return results;
+					  } catch (error) {
+						console.log(error);
+						return error;
+					  }
+					}, command);
+					console.log(this.productReviews);
+					return true;
+				  } catch (error) {
+					console.log("error", error);
+					return false;
+				  }
 			default:
 				console.log("error");
 				break;
@@ -157,8 +275,9 @@ class PuppeteerManager {
 		return this.allProducts;
 	}
 
-	async getProductDetails() {
-		return null;
+	async getProductReviews() {
+		await this.runPuppeteer();
+		return this.productReviews;
 	}
 	// async preparePageForTests(page) {
 	// 	// Pass the User-Agent Test.

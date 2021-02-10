@@ -58,6 +58,43 @@ const getProductsHandler = async ({url, commands, nrOfPages}) => {
     }
 }
 
+router.post('/product/productReviews', async (req, res) => {
+    req.setTimeout(timeout);
+    try {
+        console.log(req.body);
+        
+        await getProductReviewsHandler(req.body).then(result => {
+            let response = {
+                msg: 'retrieved products ',
+                hostname: os.hostname(),
+                reviews: result
+            }
+            console.log('done');
+            res.send(response);
+        })
+    } catch (error) {
+        res.send({ error: error.toString()});
+    }
+  });
+
+  const getProductReviewsHandler = async ({url, commands, nrOfPages}) => {
+    let pMng = require('./puppeteerManager')
+    let puppeteerMng = new pMng.PuppeteerManager({url, commands, nrOfPages})
+    browsers += 1
+    try {
+      let productReviews = await puppeteerMng.getProductReviews().then(result => {
+        return result
+      })
+      browsers -= 1
+      return productReviews
+    } catch (error) {
+      browsers -= 1
+      console.log(error)
+    }
+  }
+  
+
+
 const sleep = (ms) => {
     console.log(' running maximum number of browsers')
     return new Promise(resolve => setTimeout(resolve, ms));
