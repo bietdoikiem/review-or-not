@@ -198,7 +198,7 @@ class PuppeteerManager {
                   )[0].innerText
                 );
                 nextPage++;
-                await wait(500);
+                await wait(1000);
                 pages = null;
                 pages = document.getElementsByClassName(
                   "shopee-icon-button--right"

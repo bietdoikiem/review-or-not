@@ -7,7 +7,8 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-const review = require('./review_scrapper/index.js');
+
+const keyword = require('./scraper_keyword/index');
 
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static('client/build'));
@@ -26,7 +27,8 @@ app.get("/", (req, res) => {
     })
 })
 
-app.use("/api", review);
+
+app.use("/api", keyword);
  
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
