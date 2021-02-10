@@ -27,10 +27,13 @@ class PuppeteerManager {
 		console.log("commands length", commands.length);
 		const browser = await puppeteer.launch({
 			headless: false,
-			args: ["--no-sandbox", "--disable-gpu", "--start-maximized"],
-			defaultViewport: null
+			args: ["--no-sandbox", "--disable-gpu", "--start-maximized", '--window-size=1920,1080'],
 		});
 		let page = await browser.newPage();
+		await page.setViewport({
+			width: 1920,
+			height: 1080,
+		  });
 		// await this.preparePageForTests(page);
 		page.on("console", (msg) => {
 			for (let i = 0; i < msg._args.lengths; ++i) {
@@ -132,7 +135,7 @@ class PuppeteerManager {
 					console.log("error", error);
 					return false;
 				}
-			case "getItems":
+			case "getItems": /* Selector: .col-xs-2-4.shopee-search-item-result__item */
 				try {
 					let products = await frame
 						.evaluate((command) => {
@@ -187,7 +190,7 @@ class PuppeteerManager {
 					console.log("error", error);
 					return false;
 				}
-			case "getItemDetails":
+			case "getItemDetails": /* Selector: .shopee-product-rating */
 				try {
 					this.productReviews = await frame.evaluate(async (command) => {
 					  console.log(command.locatorCss);
