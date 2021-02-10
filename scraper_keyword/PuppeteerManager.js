@@ -25,7 +25,7 @@ class PuppeteerManager {
 		}
 		console.log("commands length", commands.length);
 		const browser = await puppeteer.launch({
-			headless: true,
+			headless: false,
 			args: ["--no-sandbox", "--disable-gpu", "--start-maximized"],
 			defaultViewport: null,
 		});
@@ -95,22 +95,35 @@ class PuppeteerManager {
 				try {
 					let products = await frame
 						.evaluate((command) => {
+							const convertStar = async (div) => {
+
+							}
 							try {
 								let parsedItems = [];
 								let items = document.querySelectorAll(command.locatorCss);
 								items.forEach(async (item) => {
+									let ratingList = [];
 									let link = "https://shopee.sg" + item.querySelector("a").getAttribute("href");
 									let imageUrl = item.querySelector("._39-Tsj._1tDEiO > img").getAttribute("src");
-									imageUrl = imageUrl ? imageUrl : "null";
 									let productTitle = item.querySelector("._1NoI8_.A6gE1J._1co5xN").innerText.trim();
 									let price = item.querySelector("._1xk7ak").innerText.trim();
+									let ratings = item.querySelectorAll(".shopee-rating-stars__star-wrapper");
+									await ratings.forEach(async (star) => {
+										let width = star.querySelector(".shopee-rating-stars__lit").getAttribute("style");
+										let re = /(\d+\.\d+)|(\d+)/g;
+										let matched = await width.match(re);
+										if(matched.length > 0) {
+											ratingList.push(matched[0]);
+										}
+									})
 									let product = {
 										productTitle: productTitle,
-										price: parseFloat(price),
+										price: parseFloat(price.replace(/,/g, '')),
 										link: link,
 										imageUrl: imageUrl,
+										ratings: ratingList
 									};
-									console.log(product);
+									// console.log(product);
 									parsedItems.push(product);
 								});
 								return parsedItems;
