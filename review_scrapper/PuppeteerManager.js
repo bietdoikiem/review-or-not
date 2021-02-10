@@ -144,7 +144,7 @@ class PuppeteerManager {
       case "getItemDetails":
         try {
           this.productReviews = await frame.evaluate(async (command) => {
-            console.log("neee");
+            console.log(command.locatorCss);
 
             try {
               function wait(ms) {
@@ -163,9 +163,7 @@ class PuppeteerManager {
               // Condition checking if there are reviews for the product
               while (trackingPage == nextPage && pages[0] != undefined) {
                 // Scrape review's content
-                let items = document.getElementsByClassName(
-                  "shopee-product-rating"
-                );
+                let items = document.querySelectorAll(command.locatorCss);
                 for (let elem of items) {
                   let review = {}; // Review object
                   let userReview = elem.getElementsByClassName(
