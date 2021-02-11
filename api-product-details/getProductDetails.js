@@ -22,14 +22,14 @@ const getProductDetails = async (searchQuery) => {
   const specifications = await page.$$eval("._2gVYdB > label", (cates) =>
     cates.map((cate) => cate.textContent)
   );
-  specifications.shift();
-  specifications.shift();
 
   // Get all Details
   const details = await page.$$eval("._2gVYdB > div", (cates) =>
     cates.map((cate) => cate.textContent)
   );
-  details.shift();
+  console.log(specifications);
+  console.log(details);
+  console.log("Done");
 
   // Array to hold all our results
   let dataObj = {};
@@ -72,10 +72,16 @@ const getProductDetails = async (searchQuery) => {
   );
   if (dataObj["brand"] == "No Brand") dataObj["brand"] = null;
 
-  // Other specifications
+  // Stock
   for (var i = 0; i < specifications.length; i++) {
-    dataObj[specifications[i]] = details[i];
+    if(specifications[i] == "Stock") 
+      dataObj["stock"] = details[details.length - specifications.length + i];
   }
+
+  // Other specifications
+  // for (var i = 0; i < specifications.length; i++) {
+  //   dataObj[specifications[i]] = details[i];
+  // }
 
   // Description
   dataObj["description"] = await page.$eval(
