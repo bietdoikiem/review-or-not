@@ -22,14 +22,14 @@ const getProductDetails = async (searchQuery) => {
   const specifications = await page.$$eval("._2gVYdB > label", (cates) =>
     cates.map((cate) => cate.textContent)
   );
+  specifications.shift();
+  specifications.shift();
 
   // Get all Details
   const details = await page.$$eval("._2gVYdB > div", (cates) =>
     cates.map((cate) => cate.textContent)
   );
-  console.log(specifications);
-  console.log(details);
-  console.log("Done");
+  details.shift();
 
   // Array to hold all our results
   let dataObj = {};
@@ -74,14 +74,20 @@ const getProductDetails = async (searchQuery) => {
 
   // Stock
   for (var i = 0; i < specifications.length; i++) {
-    if(specifications[i] == "Stock") 
+    if(specifications[i] == "Stock") {
       dataObj["stock"] = details[details.length - specifications.length + i];
+      details.splice(details.length - specifications.length + i, 1);
+      specifications.splice(i, 1);
+      break;
+    }
   }
 
   // Other specifications
-  // for (var i = 0; i < specifications.length; i++) {
-  //   dataObj[specifications[i]] = details[i];
-  // }
+  dataObj["specification"] = {};
+  for (var i = details.length - 1; i >= 0; i--) {
+    index = details.length - 1 - i;
+    dataObj["specification"][specifications[specifications.length - 1 - index]] = details[i];
+  }
 
   // Description
   dataObj["description"] = await page.$eval(
