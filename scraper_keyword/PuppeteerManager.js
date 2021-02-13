@@ -81,7 +81,7 @@ class PuppeteerManager {
 				}
 				commandIndex++;
 			}
-		} else if (commands[0].type == "getItemDetails") {
+		} else if (commands[0].type == "getItemDetails" || commands[0].type == "getItemReviews") {
 			while (commandIndex < commands.length) {
 				try {
 					console.log(`command ${commandIndex + 1}/${commands.length}`);
@@ -106,7 +106,7 @@ class PuppeteerManager {
 			// await frames[0].waitForSelector(commands[commandIndex].locatorCss, { timeout: timeout });
 			await this.sleep(500);
 	
-			await this.executeCommand(frames[0], commands[commandIndex]);
+			await this.executeCommand(page, commands[commandIndex]);
 			// console.log(
 			// 	"executing with locatorCss",
 			// 	commands[commandIndex].locatorCss,
@@ -120,7 +120,7 @@ class PuppeteerManager {
 		  commandIndex++;
 			}	
 		} else {
-			await this.executeCommand(frames[0], commands[commandIndex]);
+			await this.executeCommand(page, commands[commandIndex]);
 		}
 		console.log("done");
 		// await browser.close();
@@ -202,7 +202,7 @@ class PuppeteerManager {
           console.log("error", error);
           return false;
         }
-      case "getItemDetails" /* Selector: .shopee-product-rating */:
+      case "getItemReviews" /* Selector: .shopee-product-rating */:
         try {
           this.productReviews = await frame.evaluate(async (command) => {
             console.log(command.locatorCss);
@@ -278,8 +278,9 @@ class PuppeteerManager {
           console.log("error", error);
           return false;
         }
-      case "getProductDetails":
+      case "getItemDetails":
         try {
+
           this.productDetails = await frame.evaluate(async (command) => {
             console.log(command.locatorCss);
 
@@ -292,104 +293,107 @@ class PuppeteerManager {
               await sleep(7000);
 
               // Click the "I AM OVER 18" if the dialog shows in the page
-              if ((await page.$(".shopee-alert-popup__message")) !== null)
-                await page.click(".shopee-alert-popup__btn");
+            //   if ((await document.$(".shopee-alert-popup__message")) !== null)
+			//     await document.click(".shopee-alert-popup__btn");
 
-              // Get all Specifications
-              const specifications = await page.$$eval(
-                "._2gVYdB > label",
-                (cates) => cates.map((cate) => cate.textContent)
-              );
-              specifications.shift();
-              specifications.shift();
+			  // Get all Specifications
+            //   const specifications = await document.$$eval(
+            //     "._2gVYdB > label",
+            //     (cates) => cates.map((cate) => cate.textContent)
+            //   );
+            //   specifications.shift();
+            //   specifications.shift();
 
-              // Get all Details
-              const details = await page.$$eval("._2gVYdB > div", (details) =>
-                details.map((detail) => detail.textContent)
-              );
-              details.shift();
+            //   // Get all Details
+            //   const details = await document.$$eval("._2gVYdB > div", (details) =>
+            //     details.map((detail) => detail.textContent)
+            //   );
+            //   details.shift();
 
               // Array to hold all our results
               let detail = {};
 
               // Take each element and store it
               // Title
-              detail["title"] = await page.$eval(
-                "._3ZV7fL > span",
-                (text) => text.textContent
-              );
+            //   detail["title"] = await page.$eval(
+            //     "._3ZV7fL > span",
+            //     (text) => text.textContent
+			//   );
+			detail["title"] = document.querySelectorAll("._3ZV7fL")[0].getElementsByTagName("span")[0].innerHTML
 
-              // URL image
-              detail["imageUrl"] = await page.$eval("._39-Tsj > div", (div) =>
-                div
-                  .getAttribute("style")
-                  .substring(23, div.getAttribute("style").indexOf(")") - 1)
-              );
+			
 
-              // Rating - 2 conditions to check if there are ratings or not
-              if ((await page.$("._3WXigY")) !== null)
-                detail["rating"] = await page.$eval("._3WXigY", (text) =>
-                  parseFloat(text.textContent)
-                );
-              else detail["rating"] = null;
+            //   // URL image
+            //   detail["imageUrl"] = await document.$eval("._39-Tsj > div", (div) =>
+            //     div
+            //       .getAttribute("style")
+            //       .substring(23, div.getAttribute("style").indexOf(")") - 1)
+            //   );
 
-              // Price
-              detail["price"] = await page.$eval(
-                ".AJyN7v",
-                (text) => text.textContent
-              );
+            //   // Rating - 2 conditions to check if there are ratings or not
+            //   if ((await document.$("._3WXigY")) !== null)
+            //     detail["rating"] = await document.$eval("._3WXigY", (text) =>
+            //       parseFloat(text.textContent)
+            //     );
+            //   else detail["rating"] = null;
 
-              // Category
-              detail["category"] = await page.$$eval(
-                "._2gVYdB > ._1qYtEg > a",
-                (cates) => cates.map((cate) => cate.textContent)
-              );
-              detail["category"].shift();
+            //   // Price
+            //   detail["price"] = await document.$eval(
+            //     ".AJyN7v",
+            //     (text) => text.textContent
+            //   );
 
-              // Brand
-              detail["brand"] = await page.$eval(
-                "._2gVYdB > a",
-                (text) => text.textContent
-              );
-              if (detail["brand"] == "No Brand") detail["brand"] = null;
+            //   // Category
+            //   detail["category"] = await document.$$eval(
+            //     "._2gVYdB > ._1qYtEg > a",
+            //     (cates) => cates.map((cate) => cate.textContent)
+            //   );
+            //   detail["category"].shift();
 
-              // Stock
-              for (var i = 0; i < specifications.length; i++) {
-                if (specifications[i] == "Stock") {
-                  detail["stock"] = parseInt(
-                    details[details.length - specifications.length + i]
-                  );
-                  details.splice(details.length - specifications.length + i, 1);
-                  specifications.splice(i, 1);
-                  break;
-                }
-              }
+            //   // Brand
+            //   detail["brand"] = await document.$eval(
+            //     "._2gVYdB > a",
+            //     (text) => text.textContent
+            //   );
+            //   if (detail["brand"] == "No Brand") detail["brand"] = null;
 
-              // Other specifications
-              if (details.length == 0) detail["specification"] = null;
-              else {
-                detail["specification"] = {};
-                for (var i = details.length - 1; i >= 0; i--) {
-                  index = details.length - 1 - i;
-                  detail["specification"][
-                    specifications[
-                      specifications.length - details.length + i
-                    ].toLowerCase()
-                  ] = details[i];
-                }
-                if (specifications.length != details.length) {
-                  const model = await page.$$eval("._3yEY86", (models) =>
-                    models.map((model) => model.innerHTML)
-                  );
-                  detail["specification"]["model"] = model[1];
-                }
-              }
+            //   // Stock
+            //   for (var i = 0; i < specifications.length; i++) {
+            //     if (specifications[i] == "Stock") {
+            //       detail["stock"] = parseInt(
+            //         details[details.length - specifications.length + i]
+            //       );
+            //       details.splice(details.length - specifications.length + i, 1);
+            //       specifications.splice(i, 1);
+            //       break;
+            //     }
+            //   }
 
-              // Description
-              detail["description"] = await page.$eval(
-                "._36_A1j > span",
-                (text) => text.textContent
-              );
+            //   // Other specifications
+            //   if (details.length == 0) detail["specification"] = null;
+            //   else {
+            //     detail["specification"] = {};
+            //     for (var i = details.length - 1; i >= 0; i--) {
+            //       index = details.length - 1 - i;
+            //       detail["specification"][
+            //         specifications[
+            //           specifications.length - details.length + i
+            //         ].toLowerCase()
+            //       ] = details[i];
+            //     }
+            //     if (specifications.length != details.length) {
+            //       const model = await document.$$eval("._3yEY86", (models) =>
+            //         models.map((model) => model.innerHTML)
+            //       );
+            //       detail["specification"]["model"] = model[1];
+            //     }
+            //   }
+
+            //   // Description
+            //   detail["description"] = await document.$eval(
+            //     "._36_A1j > span",
+            //     (text) => text.textContent
+            //   );
               return detail;
             } catch (error) {
               console.log(error);
