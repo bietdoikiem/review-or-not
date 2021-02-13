@@ -81,7 +81,7 @@ class PuppeteerManager {
 				}
 				commandIndex++;
 			}
-		} else {
+		} else if (commands[0].type == "getItemDetails") {
 			while (commandIndex < commands.length) {
 				try {
 					console.log(`command ${commandIndex + 1}/${commands.length}`);
@@ -119,157 +119,293 @@ class PuppeteerManager {
 		  }
 		  commandIndex++;
 			}	
+		} else {
+			await this.executeCommand(frames[0], commands[commandIndex]);
 		}
 		console.log("done");
 		// await browser.close();
-	}
+	} 
 
 	async executeCommand(frame, command) {
 		console.log(command.type, command.locatorCss);
 		switch (command.type) {
-			case "click":
-				try {
-					await frame.$eval(command.locatorCss, (elem) => elem.click());
-					return true;
-				} catch (error) {
-					console.log("error", error);
-					return false;
-				}
-			case "getItems": /* Selector: .col-xs-2-4.shopee-search-item-result__item */
-				try {
-					let products = await frame
-						.evaluate((command) => {
-							const convertStar = async (ratingList) => {
-								let actualRating = 0;
-								for (const rating of ratingList) {
-									nmlRating = rating / 100;
-									actualRating += nmlRating;
-								}
-								return parseFloat(actualRating.toFixed(1));
-							}
-							try {
-								let parsedItems = [];
-								let items = document.querySelectorAll(command.locatorCss);
-								items.forEach(async (item) => {
-									let ratingList = [];
-									let link = "https://shopee.sg" + item.querySelector("a").getAttribute("href");
-									let imageUrl = item.querySelector("._39-Tsj._1tDEiO > img").getAttribute("src");
-									let productTitle = item.querySelector("._1NoI8_.A6gE1J._1co5xN").innerText.trim();
-									let price = item.querySelector("._1xk7ak").innerText.trim();
-									let ratings = item.querySelectorAll(".shopee-rating-stars__star-wrapper");
-									await ratings.forEach(async (star) => {
-										let width = star.querySelector(".shopee-rating-stars__lit").getAttribute("style");
-										let re = /(\d+\.\d+)|(\d+)/g;
-										let matched = await width.match(re);
-										if(matched.length > 0) {
-											ratingList.push(parseFloat(matched[0]));
-										}
-									})
-									let actualRating = await convertStar(ratingList);
-									let product = {
-										productTitle: productTitle,
-										price: parseFloat(price.replace(/,/g, '')),
-										link: link,
-										imageUrl: imageUrl,
-										ratings: actualRating
-									};
-									// console.log(product);
-									parsedItems.push(product);
-								});
-								return parsedItems;
-							} catch (error) {
-								console.log(error);
-							}
-						}, command)
-						.then((result) => {
-							this.allProducts.push.apply(this.allProducts, result);
-							console.log("allProducts length", this.allProducts.length);
-						});
-					return true;
-				} catch (error) {
-					console.log("error", error);
-					return false;
-				}
-			case "getItemDetails": /* Selector: .shopee-product-rating */
-				try {
-					this.productReviews = await frame.evaluate(async (command) => {
-					  console.log(command.locatorCss);
-		  
-					  try {
-						function wait(ms) {
-						  return new Promise((resolve) =>
-							setTimeout(() => resolve(), ms)
-						  );
-						}
-						let results = [];
-		  
-						let pages = document.getElementsByClassName(
-						  "shopee-icon-button--right"
-						);
-		  
-						let trackingPage = 1;
-						let nextPage = 1;
-						// Condition checking if there are reviews for the product
-						while (trackingPage == nextPage && pages[0] != undefined) {
-						  // Scrape review's content
-						  let items = document.querySelectorAll(command.locatorCss);
-						  for (let elem of items) {
-							let review = {}; // Review object
-							let userReview = elem.getElementsByClassName(
-							  "shopee-product-rating__main"
-							)[0];
-							review["author"] = userReview.getElementsByClassName(
-							  "shopee-product-rating__author-name"
-							)[0].innerText; // Add review author
-		  
-							//Check variation
-							let reviewVariation = userReview.getElementsByClassName(
-							  "shopee-product-rating__variation"
-							)[0];
-							if (reviewVariation != undefined)
-							  review["variation"] = reviewVariation.innerText.replace(
-								"Variation: ",
-								""
-							  ); // Add review variation
-							review["content"] = userReview.getElementsByClassName(
-							  "shopee-product-rating__content"
-							)[0].innerText; // Add review content
-							review["rating"] = userReview.getElementsByClassName(
-							  "icon-rating-solid--active"
-							).length; // Add review rating
-							results.push(review); // Add to the result list
-						  }
-		  
-						  await pages[0].click();
-						  trackingPage = parseInt(
-							document.getElementsByClassName(
-							  "shopee-button-solid shopee-button-solid--primary"
-							)[0].innerText
-						  );
-						  nextPage++;
-						  await wait(1000);
-						  pages = null;
-						  pages = document.getElementsByClassName(
-							"shopee-icon-button--right"
-						  );
-						}
-		  
-						return results;
-					  } catch (error) {
-						console.log(error);
-						return error;
-					  }
-					}, command);
-					console.log(this.productReviews);
-					return true;
-				  } catch (error) {
-					console.log("error", error);
-					return false;
-				  }
-			default:
-				console.log("error");
-				break;
-		}
+      case "click":
+        try {
+          await frame.$eval(command.locatorCss, (elem) => elem.click());
+          return true;
+        } catch (error) {
+          console.log("error", error);
+          return false;
+        }
+      case "getItems" /* Selector: .col-xs-2-4.shopee-search-item-result__item */:
+        try {
+          let products = await frame
+            .evaluate((command) => {
+              const convertStar = async (ratingList) => {
+                let actualRating = 0;
+                for (const rating of ratingList) {
+                  nmlRating = rating / 100;
+                  actualRating += nmlRating;
+                }
+                return parseFloat(actualRating.toFixed(1));
+              };
+              try {
+                let parsedItems = [];
+                let items = document.querySelectorAll(command.locatorCss);
+                items.forEach(async (item) => {
+                  let ratingList = [];
+                  let link =
+                    "https://shopee.sg" +
+                    item.querySelector("a").getAttribute("href");
+                  let imageUrl = item
+                    .querySelector("._39-Tsj._1tDEiO > img")
+                    .getAttribute("src");
+                  let productTitle = item
+                    .querySelector("._1NoI8_.A6gE1J._1co5xN")
+                    .innerText.trim();
+                  let price = item.querySelector("._1xk7ak").innerText.trim();
+                  let ratings = item.querySelectorAll(
+                    ".shopee-rating-stars__star-wrapper"
+                  );
+                  await ratings.forEach(async (star) => {
+                    let width = star
+                      .querySelector(".shopee-rating-stars__lit")
+                      .getAttribute("style");
+                    let re = /(\d+\.\d+)|(\d+)/g;
+                    let matched = await width.match(re);
+                    if (matched.length > 0) {
+                      ratingList.push(parseFloat(matched[0]));
+                    }
+                  });
+                  let actualRating = await convertStar(ratingList);
+                  let product = {
+                    productTitle: productTitle,
+                    price: parseFloat(price.replace(/,/g, "")),
+                    link: link,
+                    imageUrl: imageUrl,
+                    ratings: actualRating,
+                  };
+                  // console.log(product);
+                  parsedItems.push(product);
+                });
+                return parsedItems;
+              } catch (error) {
+                console.log(error);
+              }
+            }, command)
+            .then((result) => {
+              this.allProducts.push.apply(this.allProducts, result);
+              console.log("allProducts length", this.allProducts.length);
+            });
+          return true;
+        } catch (error) {
+          console.log("error", error);
+          return false;
+        }
+      case "getItemDetails" /* Selector: .shopee-product-rating */:
+        try {
+          this.productReviews = await frame.evaluate(async (command) => {
+            console.log(command.locatorCss);
+
+            try {
+              function wait(ms) {
+                return new Promise((resolve) =>
+                  setTimeout(() => resolve(), ms)
+                );
+              }
+              let results = [];
+
+              let pages = document.getElementsByClassName(
+                "shopee-icon-button--right"
+              );
+
+              let trackingPage = 1;
+              let nextPage = 1;
+              // Condition checking if there are reviews for the product
+              while (trackingPage == nextPage && pages[0] != undefined) {
+                // Scrape review's content
+                let items = document.querySelectorAll(command.locatorCss);
+                for (let elem of items) {
+                  let review = {}; // Review object
+                  let userReview = elem.getElementsByClassName(
+                    "shopee-product-rating__main"
+                  )[0];
+                  review["author"] = userReview.getElementsByClassName(
+                    "shopee-product-rating__author-name"
+                  )[0].innerText; // Add review author
+
+                  //Check variation
+                  let reviewVariation = userReview.getElementsByClassName(
+                    "shopee-product-rating__variation"
+                  )[0];
+                  if (reviewVariation != undefined)
+                    review["variation"] = reviewVariation.innerText.replace(
+                      "Variation: ",
+                      ""
+                    ); // Add review variation
+                  review["content"] = userReview.getElementsByClassName(
+                    "shopee-product-rating__content"
+                  )[0].innerText; // Add review content
+                  review["rating"] = userReview.getElementsByClassName(
+                    "icon-rating-solid--active"
+                  ).length; // Add review rating
+                  results.push(review); // Add to the result list
+                }
+
+                await pages[0].click();
+                trackingPage = parseInt(
+                  document.getElementsByClassName(
+                    "shopee-button-solid shopee-button-solid--primary"
+                  )[0].innerText
+                );
+                nextPage++;
+                await wait(1000);
+                pages = null;
+                pages = document.getElementsByClassName(
+                  "shopee-icon-button--right"
+                );
+              }
+
+              return results;
+            } catch (error) {
+              console.log(error);
+              return error;
+            }
+          }, command);
+          console.log(this.productReviews);
+          return true;
+        } catch (error) {
+          console.log("error", error);
+          return false;
+        }
+      case "getProductDetails":
+        try {
+          this.productDetails = await frame.evaluate(async (command) => {
+            console.log(command.locatorCss);
+
+            try {
+              function sleep(ms) {
+                return new Promise((resolve) => {
+                  setTimeout(resolve, ms);
+                });
+              }
+              await sleep(7000);
+
+              // Click the "I AM OVER 18" if the dialog shows in the page
+              if ((await page.$(".shopee-alert-popup__message")) !== null)
+                await page.click(".shopee-alert-popup__btn");
+
+              // Get all Specifications
+              const specifications = await page.$$eval(
+                "._2gVYdB > label",
+                (cates) => cates.map((cate) => cate.textContent)
+              );
+              specifications.shift();
+              specifications.shift();
+
+              // Get all Details
+              const details = await page.$$eval("._2gVYdB > div", (details) =>
+                details.map((detail) => detail.textContent)
+              );
+              details.shift();
+
+              // Array to hold all our results
+              let detail = {};
+
+              // Take each element and store it
+              // Title
+              detail["title"] = await page.$eval(
+                "._3ZV7fL > span",
+                (text) => text.textContent
+              );
+
+              // URL image
+              detail["imageUrl"] = await page.$eval("._39-Tsj > div", (div) =>
+                div
+                  .getAttribute("style")
+                  .substring(23, div.getAttribute("style").indexOf(")") - 1)
+              );
+
+              // Rating - 2 conditions to check if there are ratings or not
+              if ((await page.$("._3WXigY")) !== null)
+                detail["rating"] = await page.$eval("._3WXigY", (text) =>
+                  parseFloat(text.textContent)
+                );
+              else detail["rating"] = null;
+
+              // Price
+              detail["price"] = await page.$eval(
+                ".AJyN7v",
+                (text) => text.textContent
+              );
+
+              // Category
+              detail["category"] = await page.$$eval(
+                "._2gVYdB > ._1qYtEg > a",
+                (cates) => cates.map((cate) => cate.textContent)
+              );
+              detail["category"].shift();
+
+              // Brand
+              detail["brand"] = await page.$eval(
+                "._2gVYdB > a",
+                (text) => text.textContent
+              );
+              if (detail["brand"] == "No Brand") detail["brand"] = null;
+
+              // Stock
+              for (var i = 0; i < specifications.length; i++) {
+                if (specifications[i] == "Stock") {
+                  detail["stock"] = parseInt(
+                    details[details.length - specifications.length + i]
+                  );
+                  details.splice(details.length - specifications.length + i, 1);
+                  specifications.splice(i, 1);
+                  break;
+                }
+              }
+
+              // Other specifications
+              if (details.length == 0) detail["specification"] = null;
+              else {
+                detail["specification"] = {};
+                for (var i = details.length - 1; i >= 0; i--) {
+                  index = details.length - 1 - i;
+                  detail["specification"][
+                    specifications[
+                      specifications.length - details.length + i
+                    ].toLowerCase()
+                  ] = details[i];
+                }
+                if (specifications.length != details.length) {
+                  const model = await page.$$eval("._3yEY86", (models) =>
+                    models.map((model) => model.innerHTML)
+                  );
+                  detail["specification"]["model"] = model[1];
+                }
+              }
+
+              // Description
+              detail["description"] = await page.$eval(
+                "._36_A1j > span",
+                (text) => text.textContent
+              );
+              return detail;
+            } catch (error) {
+              console.log(error);
+              return error;
+            }
+          }, command);
+          console.log(this.productDetails);
+          return true;
+        } catch (error) {
+          console.log("error", error);
+          return false;
+        }
+      default:
+        console.log("error");
+        break;
+    }
 	}
 
 	sleep(ms) {
@@ -285,6 +421,12 @@ class PuppeteerManager {
 		await this.runPuppeteer();
 		return this.productReviews;
 	}
+
+	async getProductDetails() {
+		await this.runPuppeteer();
+		return this.productDetails;
+	}
+	
 	// async preparePageForTests(page) {
 	// 	// Pass the User-Agent Test.
 	// 	const userAgent = 'Mozilla/5.0 (X11; Linux x86_64)' +

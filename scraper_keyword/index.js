@@ -80,20 +80,49 @@ router.post('/product/product-reviews', async (req, res) => {
   const getProductReviewsHandler = async ({url, commands, nrOfPages}) => {
     let pMng = require('./puppeteerManager')
     let puppeteerMng = new pMng.PuppeteerManager({url, commands, nrOfPages})
-    browsers += 1
     try {
       let productReviews = await puppeteerMng.getProductReviews().then(result => {
         return result
       })
-      browsers -= 1
       return productReviews
     } catch (error) {
-      browsers -= 1
       console.log(error)
     }
   }
-  
 
+router.post("/product/product-details", async (req, res) => {
+  req.setTimeout(timeout);
+  try {
+    console.log(req.body);
+
+    await getProductDetailsHandler(req.body).then((result) => {
+      let response = {
+        msg: "retrieved products ",
+        hostname: os.hostname(),
+        details: result,
+      };
+      console.log("done");
+      res.send(response);
+    });
+  } catch (error) {
+    res.send({ error: error.toString() });
+  }
+});
+
+const getProductDetailsHandler = async ({ url, commands, nrOfPages }) => {
+  let pMng = require("./puppeteerManager");
+  let puppeteerMng = new pMng.PuppeteerManager({ url, commands, nrOfPages });
+  try {
+    let productDetails = await puppeteerMng
+      .getProductDetails()
+      .then((result) => {
+        return result;
+      });
+    return productDetails;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const sleep = (ms) => {
     console.log(' running maximum number of browsers')
