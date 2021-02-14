@@ -12,7 +12,7 @@ let timeout = 1500000
 
 
 router.get('/keyword', (req, res) => {
-    // console.log(os.hostname());
+    console.log(os.hostname());
     let response = {
         msg: 'Endpoint to scrape product by keywords',
         hostname: os.hostname().toString()

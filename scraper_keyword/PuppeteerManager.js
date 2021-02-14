@@ -57,7 +57,7 @@ class PuppeteerManager {
 		if (commands[0].type == "getItems") {
 			while (commandIndex < commands.length) {
 				try {
-					// console.log(`command ${commandIndex + 1}/${commands.length}`);
+					console.log(`command ${commandIndex + 1}/${commands.length}`);
 					let frames = await page.frames();
 					await frames[0].waitForSelector(commands[commandIndex].locatorCss, { timeout: timeout });
 	
