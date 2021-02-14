@@ -12,7 +12,7 @@ let timeout = 1500000
 
 
 router.get('/keyword', (req, res) => {
-    console.log(os.hostname());
+    // console.log(os.hostname());
     let response = {
         msg: 'Endpoint to scrape product by keywords',
         hostname: os.hostname().toString()
@@ -34,7 +34,7 @@ router.post('/products/keyword', async (req, res) => {
                 hostname: os.hostname(),
                 products: result
             }
-            console.log('done');
+            console.log('Done!');
             res.send(response);
         })
     } catch (error) {
@@ -69,7 +69,7 @@ router.post('/product/product-reviews', async (req, res) => {
                 hostname: os.hostname(),
                 reviews: result
             }
-            console.log('done');
+            console.log('Done!');
             res.send(response);
         })
     } catch (error) {
@@ -93,7 +93,7 @@ router.post('/product/product-reviews', async (req, res) => {
 router.post("/product/product-details", async (req, res) => {
   req.setTimeout(timeout);
   try {
-    console.log(req.body);
+    // console.log(req.body);
 
     await getProductDetailsHandler(req.body).then((result) => {
       let response = {
@@ -101,7 +101,7 @@ router.post("/product/product-details", async (req, res) => {
         hostname: os.hostname(),
         details: result,
       };
-      console.log("done");
+      console.log("Done!");
       res.send(response);
     });
   } catch (error) {

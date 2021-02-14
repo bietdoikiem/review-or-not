@@ -38,15 +38,15 @@ class PuppeteerManager {
 		page.on("console", (msg) => {
 			for (let i = 0; i < msg._args.lengths; ++i) {
 				msg._args[i].jsonValue().then((result) => {
-					console.log(result);
+					// console.log(result);
 				});
 			}
 		});
 		await page.goto(this.url,
-      { waitUntil: "networkidle2" },
-      function () {
-        console.log(this.url);
-      }
+      { waitUntil: "networkidle2" }
+      // ,function () {
+      //   console.log(this.url);
+      // }
     );
 
 		let commandIndex = 0;
@@ -57,7 +57,7 @@ class PuppeteerManager {
 		if (commands[0].type == "getItems") {
 			while (commandIndex < commands.length) {
 				try {
-					console.log(`command ${commandIndex + 1}/${commands.length}`);
+					// console.log(`command ${commandIndex + 1}/${commands.length}`);
 					let frames = await page.frames();
 					await frames[0].waitForSelector(commands[commandIndex].locatorCss, { timeout: timeout });
 	
@@ -87,36 +87,37 @@ class PuppeteerManager {
 		} else if (commands[0].type == "getItemDetails" || commands[0].type == "getItemReviews") {
 			while (commandIndex < commands.length) {
 				try {
-					console.log(`command ${commandIndex + 1}/${commands.length}`);
-					let frames = await page.frames();
-	
-			/* Scroll event */
-			
-			const bodyHandle = await page.$("body");
-			const { height } = await bodyHandle.boundingBox();
-			await bodyHandle.dispose();
-	
-			const viewportHeight = page.viewport().height;
-			let viewportIncr = 0;
-			while (viewportIncr + viewportHeight < height) {
-			  await page.evaluate((_viewportHeight) => {
-				window.scrollBy(0, _viewportHeight);
-			  }, viewportHeight);
-			  await this.sleep(500);
-			  viewportIncr = viewportIncr + viewportHeight;
-			}
-	
-			// await frames[0].waitForSelector(commands[commandIndex].locatorCss, { timeout: timeout });
-			await this.sleep(500);
-	
-			await this.executeCommand(page, commands[commandIndex]);
-			// console.log(
-			// 	"executing with locatorCss",
-			// 	commands[commandIndex].locatorCss,
-			// 	"and command type",
-			// 	commands[commandIndex].type
-			// ); /* test */
-		  } catch (error) {
+          // console.log(`command ${commandIndex + 1}/${commands.length}`);
+          let frames = await page.frames();
+
+          /* Scroll event for Get Reviews*/
+          if (commands[0].type == "getItemReviews") {
+            const bodyHandle = await page.$("body");
+            const { height } = await bodyHandle.boundingBox();
+            await bodyHandle.dispose();
+
+            const viewportHeight = page.viewport().height;
+            let viewportIncr = 0;
+            while (viewportIncr + viewportHeight < height) {
+              await page.evaluate((_viewportHeight) => {
+                window.scrollBy(0, _viewportHeight);
+              }, viewportHeight);
+              await this.sleep(500);
+              viewportIncr = viewportIncr + viewportHeight;
+            }
+          }
+
+          // await frames[0].waitForSelector(commands[commandIndex].locatorCss, { timeout: timeout });
+          // await this.sleep(500);
+
+          await this.executeCommand(page, commands[commandIndex]);
+          // console.log(
+          // 	"executing with locatorCss",
+          // 	commands[commandIndex].locatorCss,
+          // 	"and command type",
+          // 	commands[commandIndex].type
+          // ); /* test */
+        } catch (error) {
 			console.log(error);
 			break;
 		  }
@@ -125,12 +126,12 @@ class PuppeteerManager {
 		} else {
 			await this.executeCommand(page, commands[commandIndex]);
 		}
-		console.log("done");
-		// await browser.close();
+		// console.log("done");
+		await browser.close();
 	} 
 
 	async executeCommand(frame, command) {
-		console.log(command.type, command.locatorCss);
+		// console.log(command.type, command.locatorCss);
 		switch (command.type) {
       case "click":
         try {
@@ -275,16 +276,16 @@ class PuppeteerManager {
               return error;
             }
           }, command);
-          console.log(this.productReviews);
+          // console.log(this.productReviews);
           return true;
         } catch (error) {
           console.log("error", error);
           return false;
         }
-      case "getItemDetails":
+      case "getItemDetails" /* Selector: null */:
         try {
           this.productDetails = await frame.evaluate(async (command) => {
-            console.log(command.locatorCss);
+            // console.log(command.locatorCss);
 
             try {
               function sleep(ms) {
@@ -292,14 +293,14 @@ class PuppeteerManager {
                   setTimeout(resolve, ms);
                 });
               }
-               await sleep(7000);
+              // await sleep(1000);
 
               // Get all Specifications
               const specifications = [];
-              let specifi = document.querySelectorAll("._1-gNZm");
-              for(var i = 2; i < specifi.length; i++) specifications.push(specifi[i].innerText);
+              let specif = document.querySelectorAll("._1-gNZm");
+              for (var i = 2; i < specif.length; i++) specifications.push(specif[i].innerText);
 
-              // Get all Details
+              // Get all Details in Product Specifications Section
               const details = [];
               const det = document.querySelectorAll("._2gVYdB > div");
               for (var i = 1; i < det.length; i++) details.push(det[i].innerText);
@@ -309,16 +310,16 @@ class PuppeteerManager {
 
               // Take each element and store it
               // Title
-			        detail["title"] = document.querySelectorAll("._3ZV7fL")[0].getElementsByTagName("span")[0].innerText;
+              detail["title"] = document.querySelectorAll("._3ZV7fL")[0].getElementsByTagName("span")[0].innerText;
 
               // URL image
-              const imgUrl = document.querySelector("._39-Tsj > div").getAttribute("style")
+              const imgUrl = document.querySelector("._39-Tsj > div").getAttribute("style");
               detail["imageUrl"] = imgUrl.substring(23, imgUrl.indexOf(")") - 1);
 
               // Rating - 2 conditions to check if there are ratings or not
-              if (document.querySelector("._3WXigY") !== null) {
+              if (document.querySelector("._3WXigY") !== null) 
                 detail["rating"] = parseFloat(document.querySelectorAll("._3WXigY")[0].innerText);
-              } else detail["rating"] = null;
+              else detail["rating"] = null;
 
               // Price
               detail["price"] = document.querySelectorAll(".AJyN7v")[0].innerText;
@@ -335,7 +336,9 @@ class PuppeteerManager {
               // Stock
               for (var i = 0; i < specifications.length; i++) {
                 if (specifications[i] == "Stock") {
-                  detail["stock"] = parseInt(details[details.length - specifications.length + i]);
+                  detail["stock"] = parseInt(
+                    details[details.length - specifications.length + i]
+                  );
                   details.splice(details.length - specifications.length + i, 1);
                   specifications.splice(i, 1);
                   break;
@@ -349,9 +352,11 @@ class PuppeteerManager {
                 for (var i = details.length - 1; i >= 0; i--) {
                   index = details.length - 1 - i;
                   detail["specification"][
-                    specifications[specifications.length - details.length + i].toLowerCase()] = details[i];
+                    specifications[
+                      specifications.length - details.length + i].toLowerCase()
+                  ] = details[i];
                 }
-                if (specifications.length != details.length) 
+                if (specifications.length != details.length)
                   detail["specification"]["model"] = document.querySelectorAll("._3yEY86")[1].innerText;
               }
 
@@ -364,7 +369,7 @@ class PuppeteerManager {
               return error;
             }
           }, command);
-          console.log(this.productDetails);
+          // console.log(this.productDetails);
           return true;
         } catch (error) {
           console.log("error", error);
@@ -376,9 +381,9 @@ class PuppeteerManager {
     }
 	}
 
-	sleep(ms) {
-		return new Promise((resolve) => setTimeout(resolve, ms));
-	}
+	// sleep(ms) {
+	// 	return new Promise((resolve) => setTimeout(resolve, ms));
+	// }
 
 	async getAllProducts() {
 		await this.runPuppeteer();
@@ -413,4 +418,4 @@ class PuppeteerManager {
 	}
 }
 
-module.exports = { PuppeteerManager };
+module.exports = {PuppeteerManager};
