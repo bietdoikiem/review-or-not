@@ -233,16 +233,20 @@ class PuppeteerManager {
                   review["author"] = userReview.getElementsByClassName(
                     "shopee-product-rating__author-name"
                   )[0].innerText; // Add review author
-
+					
+				  review["time"] = userReview.getElementsByClassName("shopee-product-rating__time")[0].innerText
                   //Check variation
                   let reviewVariation = userReview.getElementsByClassName(
                     "shopee-product-rating__variation"
                   )[0];
-                  if (reviewVariation != undefined)
-                    review["variation"] = reviewVariation.innerText.replace(
-                      "Variation: ",
-                      ""
-                    ); // Add review variation
+                  if (reviewVariation != undefined) {
+					  let a =  reviewVariation.innerText.replace(
+						"Variation: ",
+						""
+					  ).split(",");
+					review["variation"] = a // Add review variation
+				  }
+                    
                   review["content"] = userReview.getElementsByClassName(
                     "shopee-product-rating__content"
                   )[0].innerText; // Add review content
