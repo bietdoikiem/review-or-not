@@ -24,7 +24,7 @@ class PuppeteerManager {
 		} else {
 			commands = this.existingCommands;
 		}
-		console.log("commands length", commands.length);
+		// console.log("commands length", commands.length);
 		const browser = await puppeteer.launch({
 			headless: false,
 			args: ["--no-sandbox", "--disable-gpu", "--start-maximized", '--window-size=1920,1080'],
@@ -38,13 +38,16 @@ class PuppeteerManager {
 		page.on("console", (msg) => {
 			for (let i = 0; i < msg._args.lengths; ++i) {
 				msg._args[i].jsonValue().then((result) => {
-					console.log(result);
+					// console.log(result);
 				});
 			}
 		});
-		await page.goto(this.url, { waitUntil: "networkidle2" }, function() {
-			console.log(this.url)
-		});
+		await page.goto(this.url,
+      { waitUntil: "networkidle2" }
+      // ,function () {
+      //   console.log(this.url);
+      // }
+    );
 
 		let commandIndex = 0;
 		const timeout = 5000;
@@ -84,36 +87,37 @@ class PuppeteerManager {
 		} else if (commands[0].type == "getItemDetails" || commands[0].type == "getItemReviews") {
 			while (commandIndex < commands.length) {
 				try {
-					console.log(`command ${commandIndex + 1}/${commands.length}`);
-					let frames = await page.frames();
-	
-			/* Scroll event */
-			
-			const bodyHandle = await page.$("body");
-			const { height } = await bodyHandle.boundingBox();
-			await bodyHandle.dispose();
-	
-			const viewportHeight = page.viewport().height;
-			let viewportIncr = 0;
-			while (viewportIncr + viewportHeight < height) {
-			  await page.evaluate((_viewportHeight) => {
-				window.scrollBy(0, _viewportHeight);
-			  }, viewportHeight);
-			  await this.sleep(500);
-			  viewportIncr = viewportIncr + viewportHeight;
-			}
-	
-			// await frames[0].waitForSelector(commands[commandIndex].locatorCss, { timeout: timeout });
-			await this.sleep(500);
-	
-			await this.executeCommand(page, commands[commandIndex]);
-			// console.log(
-			// 	"executing with locatorCss",
-			// 	commands[commandIndex].locatorCss,
-			// 	"and command type",
-			// 	commands[commandIndex].type
-			// ); /* test */
-		  } catch (error) {
+          // console.log(`command ${commandIndex + 1}/${commands.length}`);
+          let frames = await page.frames();
+
+          /* Scroll event for Get Reviews*/
+          if (commands[0].type == "getItemReviews") {
+            const bodyHandle = await page.$("body");
+            const { height } = await bodyHandle.boundingBox();
+            await bodyHandle.dispose();
+
+            const viewportHeight = page.viewport().height;
+            let viewportIncr = 0;
+            while (viewportIncr + viewportHeight < height) {
+              await page.evaluate((_viewportHeight) => {
+                window.scrollBy(0, _viewportHeight);
+              }, viewportHeight);
+              await this.sleep(500);
+              viewportIncr = viewportIncr + viewportHeight;
+            }
+          }
+
+          // await frames[0].waitForSelector(commands[commandIndex].locatorCss, { timeout: timeout });
+          // await this.sleep(500);
+
+          await this.executeCommand(page, commands[commandIndex]);
+          // console.log(
+          // 	"executing with locatorCss",
+          // 	commands[commandIndex].locatorCss,
+          // 	"and command type",
+          // 	commands[commandIndex].type
+          // ); /* test */
+        } catch (error) {
 			console.log(error);
 			break;
 		  }
@@ -122,12 +126,12 @@ class PuppeteerManager {
 		} else {
 			await this.executeCommand(page, commands[commandIndex]);
 		}
-		console.log("done");
-		// await browser.close();
+		// console.log("done");
+		await browser.close();
 	} 
 
 	async executeCommand(frame, command) {
-		console.log(command.type, command.locatorCss);
+		// console.log(command.type, command.locatorCss);
 		switch (command.type) {
       case "click":
         try {
@@ -276,17 +280,16 @@ class PuppeteerManager {
               return error;
             }
           }, command);
-          console.log(this.productReviews);
+          // console.log(this.productReviews);
           return true;
         } catch (error) {
           console.log("error", error);
           return false;
         }
-      case "getItemDetails":
+      case "getItemDetails" /* Selector: null */:
         try {
-
           this.productDetails = await frame.evaluate(async (command) => {
-            console.log(command.locatorCss);
+            // console.log(command.locatorCss);
 
             try {
               function sleep(ms) {
@@ -294,117 +297,83 @@ class PuppeteerManager {
                   setTimeout(resolve, ms);
                 });
               }
-              await sleep(7000);
+              // await sleep(1000);
 
-              // Click the "I AM OVER 18" if the dialog shows in the page
-            //   if ((await document.$(".shopee-alert-popup__message")) !== null)
-			//     await document.click(".shopee-alert-popup__btn");
+              // Get all Specifications
+              const specifications = [];
+              let specif = document.querySelectorAll("._1-gNZm");
+              for (var i = 2; i < specif.length; i++) specifications.push(specif[i].innerText);
 
-			  // Get all Specifications
-            //   const specifications = await document.$$eval(
-            //     "._2gVYdB > label",
-            //     (cates) => cates.map((cate) => cate.textContent)
-            //   );
-            //   specifications.shift();
-            //   specifications.shift();
-
-            //   // Get all Details
-            //   const details = await document.$$eval("._2gVYdB > div", (details) =>
-            //     details.map((detail) => detail.textContent)
-            //   );
-            //   details.shift();
+              // Get all Details in Product Specifications Section
+              const details = [];
+              const det = document.querySelectorAll("._2gVYdB > div");
+              for (var i = 1; i < det.length; i++) details.push(det[i].innerText);
 
               // Array to hold all our results
               let detail = {};
 
               // Take each element and store it
               // Title
-            //   detail["title"] = await page.$eval(
-            //     "._3ZV7fL > span",
-            //     (text) => text.textContent
-			//   );
-			detail["title"] = document.querySelectorAll("._3ZV7fL")[0].getElementsByTagName("span")[0].innerHTML
+              detail["title"] = document.querySelectorAll("._3ZV7fL")[0].getElementsByTagName("span")[0].innerText;
 
-			
+              // URL image
+              const imgUrl = document.querySelector("._39-Tsj > div").getAttribute("style");
+              detail["imageUrl"] = imgUrl.substring(23, imgUrl.indexOf(")") - 1);
 
-            //   // URL image
-            //   detail["imageUrl"] = await document.$eval("._39-Tsj > div", (div) =>
-            //     div
-            //       .getAttribute("style")
-            //       .substring(23, div.getAttribute("style").indexOf(")") - 1)
-            //   );
+              // Rating - 2 conditions to check if there are ratings or not
+              if (document.querySelector("._3WXigY") !== null) 
+                detail["rating"] = parseFloat(document.querySelectorAll("._3WXigY")[0].innerText);
+              else detail["rating"] = null;
 
-            //   // Rating - 2 conditions to check if there are ratings or not
-            //   if ((await document.$("._3WXigY")) !== null)
-            //     detail["rating"] = await document.$eval("._3WXigY", (text) =>
-            //       parseFloat(text.textContent)
-            //     );
-            //   else detail["rating"] = null;
+              // Price
+              detail["price"] = document.querySelectorAll(".AJyN7v")[0].innerText;
 
-            //   // Price
-            //   detail["price"] = await document.$eval(
-            //     ".AJyN7v",
-            //     (text) => text.textContent
-            //   );
+              // Category
+              let cates = document.querySelectorAll("._2gVYdB > ._1qYtEg > a");
+              detail["category"] = [];
+              for (var i = 1; i < cates.length; i++) detail["category"].push(cates[i].innerText);
 
-            //   // Category
-            //   detail["category"] = await document.$$eval(
-            //     "._2gVYdB > ._1qYtEg > a",
-            //     (cates) => cates.map((cate) => cate.textContent)
-            //   );
-            //   detail["category"].shift();
+              // Brand
+              detail["brand"] = document.querySelectorAll("._3yEY86")[0].innerText;
+              if (detail["brand"] == "No Brand") detail["brand"] = null;
 
-            //   // Brand
-            //   detail["brand"] = await document.$eval(
-            //     "._2gVYdB > a",
-            //     (text) => text.textContent
-            //   );
-            //   if (detail["brand"] == "No Brand") detail["brand"] = null;
+              // Stock
+              for (var i = 0; i < specifications.length; i++) {
+                if (specifications[i] == "Stock") {
+                  detail["stock"] = parseInt(
+                    details[details.length - specifications.length + i]
+                  );
+                  details.splice(details.length - specifications.length + i, 1);
+                  specifications.splice(i, 1);
+                  break;
+                }
+              }
 
-            //   // Stock
-            //   for (var i = 0; i < specifications.length; i++) {
-            //     if (specifications[i] == "Stock") {
-            //       detail["stock"] = parseInt(
-            //         details[details.length - specifications.length + i]
-            //       );
-            //       details.splice(details.length - specifications.length + i, 1);
-            //       specifications.splice(i, 1);
-            //       break;
-            //     }
-            //   }
+              // Other specifications
+              if (details.length == 0) detail["specification"] = null;
+              else {
+                detail["specification"] = {};
+                for (var i = details.length - 1; i >= 0; i--) {
+                  index = details.length - 1 - i;
+                  detail["specification"][
+                    specifications[
+                      specifications.length - details.length + i].toLowerCase()
+                  ] = details[i];
+                }
+                if (specifications.length != details.length)
+                  detail["specification"]["model"] = document.querySelectorAll("._3yEY86")[1].innerText;
+              }
 
-            //   // Other specifications
-            //   if (details.length == 0) detail["specification"] = null;
-            //   else {
-            //     detail["specification"] = {};
-            //     for (var i = details.length - 1; i >= 0; i--) {
-            //       index = details.length - 1 - i;
-            //       detail["specification"][
-            //         specifications[
-            //           specifications.length - details.length + i
-            //         ].toLowerCase()
-            //       ] = details[i];
-            //     }
-            //     if (specifications.length != details.length) {
-            //       const model = await document.$$eval("._3yEY86", (models) =>
-            //         models.map((model) => model.innerHTML)
-            //       );
-            //       detail["specification"]["model"] = model[1];
-            //     }
-            //   }
+              // Description
+              detail["description"] = document.querySelector("._36_A1j > span").innerText;
 
-            //   // Description
-            //   detail["description"] = await document.$eval(
-            //     "._36_A1j > span",
-            //     (text) => text.textContent
-            //   );
               return detail;
             } catch (error) {
               console.log(error);
               return error;
             }
           }, command);
-          console.log(this.productDetails);
+          // console.log(this.productDetails);
           return true;
         } catch (error) {
           console.log("error", error);
@@ -453,4 +422,4 @@ class PuppeteerManager {
 	}
 }
 
-module.exports = { PuppeteerManager };
+module.exports = {PuppeteerManager};
