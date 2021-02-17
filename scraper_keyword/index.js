@@ -34,7 +34,7 @@ router.post('/products/keyword', async (req, res) => {
                 hostname: os.hostname(),
                 products: result
             }
-            console.log('done');
+            console.log('Done!');
             res.send(response);
         })
     } catch (error) {
@@ -57,6 +57,72 @@ const getProductsHandler = async ({url, commands, nrOfPages}) => {
         console.log(error)
     }
 }
+
+router.post('/product/product-reviews', async (req, res) => {
+    req.setTimeout(timeout);
+    try {
+        console.log(req.body);
+        
+        await getProductReviewsHandler(req.body).then(result => {
+            let response = {
+                msg: 'retrieved products ',
+                hostname: os.hostname(),
+                reviews: result
+            }
+            console.log('Done!');
+            res.send(response);
+        })
+    } catch (error) {
+        res.send({ error: error.toString()});
+    }
+  });
+
+  const getProductReviewsHandler = async ({url, commands, nrOfPages}) => {
+    let pMng = require('./puppeteerManager')
+    let puppeteerMng = new pMng.PuppeteerManager({url, commands, nrOfPages})
+    try {
+      let productReviews = await puppeteerMng.getProductReviews().then(result => {
+        return result
+      })
+      return productReviews
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+router.post("/product/product-details", async (req, res) => {
+  req.setTimeout(timeout);
+  try {
+    // console.log(req.body);
+
+    await getProductDetailsHandler(req.body).then((result) => {
+      let response = {
+        msg: "retrieved products ",
+        hostname: os.hostname(),
+        details: result,
+      };
+      console.log("Done!");
+      res.send(response);
+    });
+  } catch (error) {
+    res.send({ error: error.toString() });
+  }
+});
+
+const getProductDetailsHandler = async ({ url, commands, nrOfPages }) => {
+  let pMng = require("./puppeteerManager");
+  let puppeteerMng = new pMng.PuppeteerManager({ url, commands, nrOfPages });
+  try {
+    let productDetails = await puppeteerMng
+      .getProductDetails()
+      .then((result) => {
+        return result;
+      });
+    return productDetails;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const sleep = (ms) => {
     console.log(' running maximum number of browsers')

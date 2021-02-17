@@ -77,9 +77,9 @@ router.post('/product/productReviews', async (req, res) => {
     }
   });
 
-  const getProductReviewsHandler = async (url, commands, nrOfPages) => {
+  const getProductReviewsHandler = async ({url, commands, nrOfPages}) => {
     let pMng = require('./puppeteerManager')
-    let puppeteerMng = new pMng.PuppeteerManager(url, commands, nrOfPages)
+    let puppeteerMng = new pMng.PuppeteerManager({url, commands, nrOfPages})
     browsers += 1
     try {
       let productReviews = await puppeteerMng.getProductReviews().then(result => {
