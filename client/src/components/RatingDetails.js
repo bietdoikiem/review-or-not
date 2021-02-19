@@ -157,36 +157,10 @@ const DynamicStar = (star) => {
 	}
 };
 
-const getMockRatingMap = () => {
-	let mapObj = {
-		rating1: {
-			numOfRatings: 1,
-			percentage: 16.666,
-		},
-		rating2: {
-			numOfRatings: 0,
-			percentage: 0,
-		},
-		rating3: {
-			numOfRatings: 1,
-			percentage: 16.666,
-		},
-		rating4: {
-			numOfRatings: 1,
-			percentage: 16.666,
-		},
-		rating5: {
-			numOfRatings: 3,
-			percentage: 50,
-		},
-	};
-	return mapObj;
-};
-
 const RatingDetails = (props) => {
 	const [mapRating, setMapRating] = useState(null);
 
-	/* fetch mock rating details */
+	/* fetch rating details */
 	useEffect(() => {
 		let mapObj = props.ratingDetail;
 		setMapRating(mapObj);

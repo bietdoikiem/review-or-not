@@ -75,47 +75,43 @@ export default class ProductDetailsPage extends React.Component {
   }
 
   render() {
-    if (this.state.product.title == null) {
-      // Render loading state
-      return(
-        <div>
-          <h1>Waiting...</h1>
-        </div>
-      )
-    } else {
-      // Render real UI 
-      return (
-        <div>
-          {/* Start Breadcrumb */}
-          <div className="product_infor">
-            <Breadcrumbs>
-              <Link color="inherit" href="/">
-                Homepage
-              </Link>
-              <p color="textPrimary">{this.state.product.title}</p>
-            </Breadcrumbs>
-          </div>
-          {/* End Breadcrumb */}
+    return(
+      <div>
+        {this.state.product.title ? (
+          <React.Fragment>
+            {/* Start Breadcrumb */}
+            <div className="product_infor">
+              <Breadcrumbs>
+                <Link color="inherit" href="/">
+                  Homepage
+                </Link>
+                <p color="textPrimary">{this.state.product.title}</p>
+              </Breadcrumbs>
+            </div>
+            {/* End Breadcrumb */}
 
-          <section className="product-section">
-            <ProductBox product={this.state.product} />
-          </section>
-          <section className="product-section">
-            <SentimentGauge score={0.6} duration={1} />{" "}
-            {/* Input score in range [-1, 1], input duration is in second */}
-            <br />
-            <RatingDetails
-              rating = { this.state.product.rating }
-              numOfRatings = { this.state.product.numOfRatings }
-              ratingDetail = { this.state.product.ratingDetail }
-            />
-            <br />
-          </section>
-          <section className="product-section">
-            <ReviewCategoryBox style={{ margin: "0 auto" }} />
-          </section>
-        </div>
-      );
-    }
+            <section className="product-section">
+              <ProductBox product={this.state.product} />
+            </section>
+            <section className="product-section">
+              <SentimentGauge score={0.6} duration={1} />{" "}
+              {/* Input score in range [-1, 1], input duration is in second */}
+              <br />
+              <RatingDetails
+                rating = {this.state.product.rating}
+                numOfRatings = {this.state.product.numOfRatings}
+                ratingDetail = {this.state.product.ratingDetail}
+              />
+              <br />
+            </section>
+            <section className="product-section">
+              <ReviewCategoryBox style={{ margin: "0 auto" }} />
+            </section>
+          </React.Fragment>
+        ) : (
+          <h1>Waiting...</h1>
+        )}
+      </div>
+    )
   }
 }

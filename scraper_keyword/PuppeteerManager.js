@@ -295,7 +295,16 @@ class PuppeteerManager {
 									setTimeout(resolve, ms);
 								});
 							}
-							// await sleep(1000);
+							await sleep(1000);
+
+							// Change number if containing "k" character
+							function changeNum(string) {
+								if(string.includes("k")) {
+									const numString = string.slice(0, -1);
+									return (parseFloat(numString) * 1000);
+								}
+								else return (parseFloat(string));
+							}
 
 							// Get all Specifications
 							const specifications = [];
@@ -323,14 +332,14 @@ class PuppeteerManager {
 							// Rating - 2 conditions to check if there are ratings or not
 							if (document.querySelector("._3WXigY") !== null) {
 								detail["rating"] = parseFloat(document.querySelectorAll("._3WXigY")[0].innerText);
-								detail["numOfRatings"] = parseInt(document.querySelectorAll("._3WXigY")[1].innerText);
+								detail["numOfRatings"] = changeNum(document.querySelectorAll("._3WXigY")[1].innerText);
 								detail["ratingDetail"] = {};
 								const ratings = document.querySelectorAll(".product-rating-overview__filter");
-								detail["ratingDetail"]["rating1"] = parseInt(ratings[5].innerText.substring(8, ratings[5].innerText.length-1));
-								detail["ratingDetail"]["rating2"] = parseInt(ratings[4].innerText.substring(8, ratings[4].innerText.length-1));
-								detail["ratingDetail"]["rating3"] = parseInt(ratings[3].innerText.substring(8, ratings[3].innerText.length-1));
-								detail["ratingDetail"]["rating4"] = parseInt(ratings[2].innerText.substring(8, ratings[2].innerText.length-1));
-								detail["ratingDetail"]["rating5"] = parseInt(ratings[1].innerText.substring(8, ratings[1].innerText.length-1));
+								detail["ratingDetail"]["rating1"] = changeNum(ratings[5].innerText.substring(8, ratings[5].innerText.length-1));
+								detail["ratingDetail"]["rating2"] = changeNum(ratings[4].innerText.substring(8, ratings[4].innerText.length-1));
+								detail["ratingDetail"]["rating3"] = changeNum(ratings[3].innerText.substring(8, ratings[3].innerText.length-1));
+								detail["ratingDetail"]["rating4"] = changeNum(ratings[2].innerText.substring(8, ratings[2].innerText.length-1));
+								detail["ratingDetail"]["rating5"] = changeNum(ratings[1].innerText.substring(8, ratings[1].innerText.length-1));
 							}
 							else {
 								detail["rating"] = null;
@@ -385,7 +394,6 @@ class PuppeteerManager {
 							return error;
 						}
 					}, command);
-					// console.log(this.productDetails);
 					return true;
 				} catch (error) {
 					console.log("error", error);
