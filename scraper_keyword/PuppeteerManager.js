@@ -90,22 +90,24 @@ class PuppeteerManager {
 				try {
 					// console.log(`command ${commandIndex + 1}/${commands.length}`);
 					let frames = await page.frames();
+					
+					// Click button for 18 years old approval
+					if ((await page.$(".shopee-alert-popup__message")) !== null)
+						await page.click(".shopee-alert-popup__btn");
+					
+					/* Scroll event */
+					const bodyHandle = await page.$("body");
+					const { height } = await bodyHandle.boundingBox();
+					await bodyHandle.dispose();
 
-					/* Scroll event for Get Reviews*/
-					if (commands[0].type == "getItemReviews") {
-						const bodyHandle = await page.$("body");
-						const { height } = await bodyHandle.boundingBox();
-						await bodyHandle.dispose();
-
-						const viewportHeight = page.viewport().height;
-						let viewportIncr = 0;
-						while (viewportIncr + viewportHeight < height) {
-							await page.evaluate((_viewportHeight) => {
-								window.scrollBy(0, _viewportHeight);
-							}, viewportHeight);
-							await this.sleep(500);
-							viewportIncr = viewportIncr + viewportHeight;
-						}
+					const viewportHeight = page.viewport().height;
+					let viewportIncr = 0;
+					while (viewportIncr + viewportHeight < height) {
+						await page.evaluate((_viewportHeight) => {
+							window.scrollBy(0, _viewportHeight);
+						}, viewportHeight);
+						await this.sleep(500);
+						viewportIncr = viewportIncr + viewportHeight;
 					}
 
 					// await frames[0].waitForSelector(commands[commandIndex].locatorCss, { timeout: timeout });
@@ -284,11 +286,9 @@ class PuppeteerManager {
 					console.log("error", error);
 					return false;
 				}
-			case "getItemDetails" /* Selector: null */:
+			case "getItemDetails" /* Selector: .shopee-product-rating */:
 				try {
-					this.productDetails = await frame.evaluate(async (command) => {
-						// console.log(command.locatorCss);
-
+					this.productDetails = await frame.evaluate(async () => {
 						try {
 							function sleep(ms) {
 								return new Promise((resolve) => {
@@ -324,10 +324,18 @@ class PuppeteerManager {
 							if (document.querySelector("._3WXigY") !== null) {
 								detail["rating"] = parseFloat(document.querySelectorAll("._3WXigY")[0].innerText);
 								detail["numOfRatings"] = parseInt(document.querySelectorAll("._3WXigY")[1].innerText);
+								detail["ratingDetail"] = {};
+								const ratings = document.querySelectorAll(".product-rating-overview__filter");
+								detail["ratingDetail"]["rating1"] = parseInt(ratings[5].innerText.substring(8, ratings[5].innerText.length-1));
+								detail["ratingDetail"]["rating2"] = parseInt(ratings[4].innerText.substring(8, ratings[4].innerText.length-1));
+								detail["ratingDetail"]["rating3"] = parseInt(ratings[3].innerText.substring(8, ratings[3].innerText.length-1));
+								detail["ratingDetail"]["rating4"] = parseInt(ratings[2].innerText.substring(8, ratings[2].innerText.length-1));
+								detail["ratingDetail"]["rating5"] = parseInt(ratings[1].innerText.substring(8, ratings[1].innerText.length-1));
 							}
 							else {
 								detail["rating"] = null;
 								detail["numOfRatings"] = null;
+								detail["ratingDetail"] = null;
 							}
 
 							// Price
