@@ -188,31 +188,10 @@ const RatingDetails = (props) => {
 
 	/* fetch mock rating details */
 	useEffect(() => {
-		let mapObj = getMockRatingMap();
+		let mapObj = props.ratingDetail;
 		setMapRating(mapObj);
 	}, []);
-	useEffect(() => {
-		if (mapRating) {
-			console.log(mapRating.rating1["percentage"]);
-		}
-	}, [mapRating]);
 
-	/* Calculate average and total number of ratings */
-	const getAvgAndTotalRatings = (ratingObj) => {
-		let total = 0;
-		let sum = 0;
-		let re = /\D+/ // get only digits from strings
-		Object.keys(ratingObj).map((r) => {
-			let count = 0;
-			count += ratingObj[r]['numOfRatings']
-			total += count
-			let multiplier = parseInt(r.split(re)[1]);
-			sum += multiplier * count;
-		})
-		let avg = sum / total;
-		avg = avg.toFixed(1)
-		return {total, avg};
-	}
 	return (
 		<React.Fragment>
 			<RatingWrapper>
@@ -221,12 +200,12 @@ const RatingDetails = (props) => {
 						{mapRating ? (
 							<React.Fragment>
 								<TotalWrapper>
-									<span style={{ fontSize: "42px" }}>{getAvgAndTotalRatings(mapRating).avg}</span>
+									<span style={{ fontSize: "42px" }}>{props.rating}</span>
 								</TotalWrapper>
 								<NumOfRatingWrapper>
 									<span style={{ fontSize: "14px" }}>
 										{" "}
-										{`(${getAvgAndTotalRatings(mapRating).total} ratings)`}
+										{`(${props.numOfRatings} ratings)`}
 									</span>
 								</NumOfRatingWrapper>
 							</React.Fragment>
@@ -248,9 +227,9 @@ const RatingDetails = (props) => {
 												<React.Fragment>
 													{DynamicStar(r)} {/* Rating bar specified by dict key */}
 													<span style={{ color: "#787878", fontSize: "13px", marginLeft: "4px" }}>
-														({mapRating[r]["numOfRatings"]})
+														({mapRating[r]})
 													</span>
-													<RatingBar key={r} pct={mapRating[r]["percentage"]}>
+													<RatingBar key={r} pct={mapRating[r]/props.numOfRatings*100}>
 														<div></div>
 													</RatingBar>
 												</React.Fragment>

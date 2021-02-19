@@ -18,21 +18,27 @@ export default class ProductDetailsPage extends React.Component {
         title: null,
         urlPicture: null,
         price: null,
+        rating: null,
+        numOfRatings: null,
+        ratingDetail: null
       },
     };
   }
 
   async componentDidMount() {
-    // POST request using fetch with error handling
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         url:
-          "https://shopee.sg/Phone-12-11-Pro-XR-Max-PD-Charger-Cable-20W-Wall-Quick-Charger-USB-C-Power-Adapter-Type-C-to-Lightning-Cable-i.170352800.5262854188",
+          "https://shopee.sg/%E8%87%AA%E5%97%A8%E9%94%85%E8%87%AA%E7%83%AD%E7%B1%B3%E9%A5%AD-Zi-Hai-Guo-Self-Heating-Rice-(zihaiguo)-i.254050224.6946878734",
         nrOfPages: 1,
         commands: [
-          { description: null, locatorCss: null, type: "getItemDetails" },
+          {
+            description: null,
+            locatorCss: ".shopee-product-rating",
+            type: "getItemDetails",
+          },
         ],
       }),
     };
@@ -40,40 +46,40 @@ export default class ProductDetailsPage extends React.Component {
       "http://localhost:5000/api/product/product-details",
       requestOptions
     )
-      .then(async (response) => {
-        const data = await response.json();
+    .then(async (response) => {
+      const data = await response.json();
 
-        // check for error response
-        if (!response.ok) {
-          // get error message from body or default to response status
-          const error = (data && data.message) || response.status;
-          return Promise.reject(error);
-        }
+      // check for error response
+      if (!response.ok) {
+        // get error message from body or default to response status
+        const error = (data && data.message) || response.status;
+        return Promise.reject(error);
+      }
 
-        this.setState((prevState) => ({
-          product: {
-            ...prevState.product,
-            title: data.details.title,
-            urlPicture: data.details.imageUrl,
-            price: data.details.price,
-          },
-        }));
-
-        console.log(this.state.product.title);
-        console.log(data.details.title);
-      })
-      .catch((error) => {
-        this.setState({ errorMessage: error.toString() });
-        console.error("There was an error!", error);
-      });
+      this.setState((prevState) => ({
+        product: {
+          ...prevState.product,
+          title: data.details.title,
+          urlPicture: data.details.imageUrl,
+          price: data.details.price,
+          rating: data.details.rating,
+          numOfRatings: data.details.numOfRatings,
+          ratingDetail: data.details.ratingDetail
+        },
+      }));
+    })
+    .catch((error) => {
+      this.setState({ errorMessage: error.toString() });
+      console.error("There was an error!", error);
+    });
   }
 
   render() {
     if (this.state.product.title == null) {
-      // Render loading state ...
+      // Render loading state
       return(
         <div>
-          <p>Waiting...</p>
+          <h1>Waiting...</h1>
         </div>
       )
     } else {
@@ -98,7 +104,11 @@ export default class ProductDetailsPage extends React.Component {
             <SentimentGauge score={0.6} duration={1} />{" "}
             {/* Input score in range [-1, 1], input duration is in second */}
             <br />
-            <RatingDetails />
+            <RatingDetails
+              rating = { this.state.product.rating }
+              numOfRatings = { this.state.product.numOfRatings }
+              ratingDetail = { this.state.product.ratingDetail }
+            />
             <br />
           </section>
           <section className="product-section">
