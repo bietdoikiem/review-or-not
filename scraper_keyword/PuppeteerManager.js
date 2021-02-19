@@ -321,9 +321,14 @@ class PuppeteerManager {
 							detail["imageUrl"] = imgUrl.substring(23, imgUrl.indexOf(")") - 1);
 
 							// Rating - 2 conditions to check if there are ratings or not
-							if (document.querySelector("._3WXigY") !== null)
+							if (document.querySelector("._3WXigY") !== null) {
 								detail["rating"] = parseFloat(document.querySelectorAll("._3WXigY")[0].innerText);
-							else detail["rating"] = null;
+								detail["numOfRatings"] = parseInt(document.querySelectorAll("._3WXigY")[1].innerText);
+							}
+							else {
+								detail["rating"] = null;
+								detail["numOfRatings"] = null;
+							}
 
 							// Price
 							detail["price"] = document.querySelectorAll(".AJyN7v")[0].innerText;
