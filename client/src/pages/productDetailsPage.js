@@ -31,7 +31,7 @@ export default class ProductDetailsPage extends React.Component {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         url:
-          "https://shopee.sg/%E8%87%AA%E5%97%A8%E9%94%85%E8%87%AA%E7%83%AD%E7%B1%B3%E9%A5%AD-Zi-Hai-Guo-Self-Heating-Rice-(zihaiguo)-i.254050224.6946878734",
+          "https://shopee.sg/%E3%80%90Same-Day-Delivery%E3%80%91-ASUS-Zenbook-14-UM425IA-AM092T-14inch-FHD-IPS-Ryzen-7-4700U-1TB-SSD-67Wh-2Y-ASUS-Warranty-i.51678844.7148374888",
         nrOfPages: 1,
         commands: [
           {
@@ -63,8 +63,8 @@ export default class ProductDetailsPage extends React.Component {
           urlPicture: data.details.imageUrl,
           price: data.details.price,
           rating: data.details.rating,
-          numOfRatings: data.details.numOfRatings,
-          ratingDetail: data.details.ratingDetail
+          // numOfRatings: data.details.numOfRatings,
+          // ratingDetail: data.details.ratingDetail
         },
       }));
     })

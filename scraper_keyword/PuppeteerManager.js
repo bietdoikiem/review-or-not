@@ -26,7 +26,7 @@ class PuppeteerManager {
 		}
 		// console.log("commands length", commands.length);
 		const browser = await puppeteer.launch({
-			headless: false,
+			headless: true,
 			args: ["--no-sandbox", "--disable-gpu", "--start-maximized", "--window-size=1920,1080"],
 		});
 		let page = await browser.newPage();
@@ -91,23 +91,21 @@ class PuppeteerManager {
 					// console.log(`command ${commandIndex + 1}/${commands.length}`);
 					let frames = await page.frames();
 					
-					// Click button for 18 years old approval
-					if ((await page.$(".shopee-alert-popup__message")) !== null)
-						await page.click(".shopee-alert-popup__btn");
-					
-					/* Scroll event */
-					const bodyHandle = await page.$("body");
-					const { height } = await bodyHandle.boundingBox();
-					await bodyHandle.dispose();
+					/* Scroll event for Item Reviews */
+					if (commands[0].type == "getItemReviews") {
+						const bodyHandle = await page.$("body");
+						const { height } = await bodyHandle.boundingBox();
+						await bodyHandle.dispose();
 
-					const viewportHeight = page.viewport().height;
-					let viewportIncr = 0;
-					while (viewportIncr + viewportHeight < height) {
-						await page.evaluate((_viewportHeight) => {
-							window.scrollBy(0, _viewportHeight);
-						}, viewportHeight);
-						await this.sleep(500);
-						viewportIncr = viewportIncr + viewportHeight;
+						const viewportHeight = page.viewport().height;
+						let viewportIncr = 0;
+						while (viewportIncr + viewportHeight < height) {
+							await page.evaluate((_viewportHeight) => {
+								window.scrollBy(0, _viewportHeight);
+							}, viewportHeight);
+							await this.sleep(500);
+							viewportIncr = viewportIncr + viewportHeight;
+						}
 					}
 
 					// await frames[0].waitForSelector(commands[commandIndex].locatorCss, { timeout: timeout });
@@ -286,7 +284,7 @@ class PuppeteerManager {
 					console.log("error", error);
 					return false;
 				}
-			case "getItemDetails" /* Selector: .shopee-product-rating */:
+			case "getItemDetails" /* Selector: null */:
 				try {
 					this.productDetails = await frame.evaluate(async () => {
 						try {
@@ -295,16 +293,7 @@ class PuppeteerManager {
 									setTimeout(resolve, ms);
 								});
 							}
-							await sleep(1000);
-
-							// Change number if containing "k" character
-							function changeNum(string) {
-								if(string.includes("k")) {
-									const numString = string.slice(0, -1);
-									return (parseFloat(numString) * 1000);
-								}
-								else return (parseFloat(string));
-							}
+							// await sleep(1000);
 
 							// Get all Specifications
 							const specifications = [];
@@ -330,22 +319,9 @@ class PuppeteerManager {
 							detail["imageUrl"] = imgUrl.substring(23, imgUrl.indexOf(")") - 1);
 
 							// Rating - 2 conditions to check if there are ratings or not
-							if (document.querySelector("._3WXigY") !== null) {
+							if (document.querySelector("._3WXigY") !== null) 
 								detail["rating"] = parseFloat(document.querySelectorAll("._3WXigY")[0].innerText);
-								detail["numOfRatings"] = changeNum(document.querySelectorAll("._3WXigY")[1].innerText);
-								detail["ratingDetail"] = {};
-								const ratings = document.querySelectorAll(".product-rating-overview__filter");
-								detail["ratingDetail"]["rating1"] = changeNum(ratings[5].innerText.substring(8, ratings[5].innerText.length-1));
-								detail["ratingDetail"]["rating2"] = changeNum(ratings[4].innerText.substring(8, ratings[4].innerText.length-1));
-								detail["ratingDetail"]["rating3"] = changeNum(ratings[3].innerText.substring(8, ratings[3].innerText.length-1));
-								detail["ratingDetail"]["rating4"] = changeNum(ratings[2].innerText.substring(8, ratings[2].innerText.length-1));
-								detail["ratingDetail"]["rating5"] = changeNum(ratings[1].innerText.substring(8, ratings[1].innerText.length-1));
-							}
-							else {
-								detail["rating"] = null;
-								detail["numOfRatings"] = null;
-								detail["ratingDetail"] = null;
-							}
+							else detail["rating"] = null;
 
 							// Price
 							detail["price"] = document.querySelectorAll(".AJyN7v")[0].innerText;
