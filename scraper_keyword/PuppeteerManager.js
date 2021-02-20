@@ -314,6 +314,10 @@ class PuppeteerManager {
 								.querySelectorAll("._3ZV7fL")[0]
 								.getElementsByTagName("span")[0].innerText;
 
+							// URL product
+							const productUrl = document.querySelectorAll("link");
+							detail["productUrl"] = productUrl[productUrl.length - 2].baseURI;
+
 							// URL image
 							const imgUrl = document.querySelector("._39-Tsj > div").getAttribute("style");
 							detail["imageUrl"] = imgUrl.substring(23, imgUrl.indexOf(")") - 1);

@@ -16,6 +16,7 @@ export default class ProductDetailsPage extends React.Component {
     this.state = {
       product: {
         title: null,
+        urlProduct: null,
         urlPicture: null,
         price: null,
         rating: null,
@@ -60,6 +61,7 @@ export default class ProductDetailsPage extends React.Component {
         product: {
           ...prevState.product,
           title: data.details.title,
+          urlProduct: data.details.productUrl,
           urlPicture: data.details.imageUrl,
           price: data.details.price,
           rating: data.details.rating,
