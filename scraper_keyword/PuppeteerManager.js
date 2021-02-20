@@ -26,7 +26,7 @@ class PuppeteerManager {
 		}
 		// console.log("commands length", commands.length);
 		const browser = await puppeteer.launch({
-			headless: true,
+			headless: false,
 			args: ["--no-sandbox", "--disable-gpu", "--start-maximized", "--window-size=1920,1080"],
 		});
 		let page = await browser.newPage();
@@ -90,8 +90,8 @@ class PuppeteerManager {
 				try {
 					// console.log(`command ${commandIndex + 1}/${commands.length}`);
 					let frames = await page.frames();
-					
-					/* Scroll event for Item Reviews */
+
+					/* Scroll event for Get Reviews*/
 					if (commands[0].type == "getItemReviews") {
 						const bodyHandle = await page.$("body");
 						const { height } = await bodyHandle.boundingBox();
@@ -103,21 +103,14 @@ class PuppeteerManager {
 							await page.evaluate((_viewportHeight) => {
 								window.scrollBy(0, _viewportHeight);
 							}, viewportHeight);
-							await this.sleep(500);
+							await this.sleep(1500);
 							viewportIncr = viewportIncr + viewportHeight;
 						}
 					}
 
-					// await frames[0].waitForSelector(commands[commandIndex].locatorCss, { timeout: timeout });
-					// await this.sleep(500);
 
 					await this.executeCommand(page, commands[commandIndex]);
-					// console.log(
-					// 	"executing with locatorCss",
-					// 	commands[commandIndex].locatorCss,
-					// 	"and command type",
-					// 	commands[commandIndex].type
-					// ); /* test */
+
 				} catch (error) {
 					console.log(error);
 					break;
@@ -222,7 +215,15 @@ class PuppeteerManager {
 							function wait(ms) {
 								return new Promise((resolve) => setTimeout(() => resolve(), ms));
 							}
-							let results = [];
+							let results = {
+								"1" : 0,
+								"2" : 0,
+								"3" : 0,
+								"4" : 0,
+								"5" : 0,
+								"reviews" : []
+							};
+							let reviews = []
 
 							let pages = document.getElementsByClassName("shopee-icon-button--right");
 
@@ -254,10 +255,29 @@ class PuppeteerManager {
 									review["content"] = userReview.getElementsByClassName(
 										"shopee-product-rating__content"
 									)[0].innerText; // Add review content
+									switch(userReview.getElementsByClassName(
+										"icon-rating-solid--active"
+									).length) {
+										case 1:
+											results['1'] += 1;
+											break;
+										case 2:
+											results['2'] += 1;
+											break;
+										case 3:
+											results['3'] += 1;
+											break;
+										case 4:
+											results['4'] += 1;
+											break;
+										case 5:
+											results['5'] += 1;
+											break;
+									}
 									review["rating"] = userReview.getElementsByClassName(
 										"icon-rating-solid--active"
 									).length; // Add review rating
-									results.push(review); // Add to the result list
+									reviews.push(review); // Add to the result list
 								}
 
 								await pages[0].click();
@@ -271,6 +291,7 @@ class PuppeteerManager {
 								pages = null;
 								pages = document.getElementsByClassName("shopee-icon-button--right");
 							}
+							results['reviews'] = reviews
 
 							return results;
 						} catch (error) {
@@ -286,7 +307,9 @@ class PuppeteerManager {
 				}
 			case "getItemDetails" /* Selector: null */:
 				try {
-					this.productDetails = await frame.evaluate(async () => {
+					this.productDetails = await frame.evaluate(async (command) => {
+						// console.log(command.locatorCss);
+
 						try {
 							function sleep(ms) {
 								return new Promise((resolve) => {
@@ -314,16 +337,12 @@ class PuppeteerManager {
 								.querySelectorAll("._3ZV7fL")[0]
 								.getElementsByTagName("span")[0].innerText;
 
-							// URL product
-							const productUrl = document.querySelectorAll("link");
-							detail["productUrl"] = productUrl[productUrl.length - 2].baseURI;
-
 							// URL image
 							const imgUrl = document.querySelector("._39-Tsj > div").getAttribute("style");
 							detail["imageUrl"] = imgUrl.substring(23, imgUrl.indexOf(")") - 1);
 
 							// Rating - 2 conditions to check if there are ratings or not
-							if (document.querySelector("._3WXigY") !== null) 
+							if (document.querySelector("._3WXigY") !== null)
 								detail["rating"] = parseFloat(document.querySelectorAll("._3WXigY")[0].innerText);
 							else detail["rating"] = null;
 
@@ -374,6 +393,7 @@ class PuppeteerManager {
 							return error;
 						}
 					}, command);
+					// console.log(this.productDetails);
 					return true;
 				} catch (error) {
 					console.log("error", error);

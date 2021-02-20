@@ -67,7 +67,7 @@ router.post('/product/product-reviews', async (req, res) => {
             let response = {
                 msg: 'retrieved products ',
                 hostname: os.hostname(),
-                reviews: result
+                results: result
             }
             console.log('Done!');
             res.send(response);
