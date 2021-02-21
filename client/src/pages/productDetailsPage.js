@@ -27,53 +27,86 @@ export default class ProductDetailsPage extends React.Component {
   }
 
   async componentDidMount() {
-    const requestOptions = {
+    const url =
+      "https://shopee.sg/-SG-Shipping-Ladybird-Key-Words-with-Peter-and-Jane-Box-Set-(36-Books)-i.147508069.2228555546";
+    const requestOptionsDetails = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        url:
-          "https://shopee.sg/%E3%80%90Same-Day-Delivery%E3%80%91-ASUS-Zenbook-14-UM425IA-AM092T-14inch-FHD-IPS-Ryzen-7-4700U-1TB-SSD-67Wh-2Y-ASUS-Warranty-i.51678844.7148374888",
+        url: url,
         nrOfPages: 1,
         commands: [
           {
             description: null,
-            locatorCss: ".shopee-product-rating",
+            locatorCss: null,
             type: "getItemDetails",
           },
         ],
       }),
     };
-    await fetch(
-      "http://localhost:5000/api/product/product-details",
-      requestOptions
-    )
-    .then(async (response) => {
-      const data = await response.json();
+    const requestOptionsReviews = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        url: url,
+        nrOfPages: 1,
+        commands: [
+          {
+            description: null,
+            locatorCss: ".shopee-product-rating",
+            type: "getItemReviews",
+          },
+        ],
+      }),
+    };
+    Promise.all([
+      fetch("http://localhost:5000/api/product/product-details", requestOptionsDetails),
+      fetch("http://localhost:5000/api/product/product-reviews", requestOptionsReviews),
+    ])
+      .then(function (responses) {
+        // Get a JSON object from each of the responses
+        return Promise.all(
+          responses.map(function (response) {
+            return response.json();
+          })
+        );
+      })
+      .then((data) => {
+        this.setState((prevState) => ({
+          product: {
+            ...prevState.product,
+            title: data[0].details.title,
+            urlProduct: data[0].details.productUrl,
+            urlPicture: data[0].details.imageUrl,
+            price: data[0].details.price,
+            rating: data[0].details.rating,
+            numOfRatings: data[1].results.numOfRatings,
+            ratingDetail: data[1].results.ratings
+          },
+        }));
+      })
+      .catch(function (error) {
+        // if there's an error, log it
+        console.log(error);
+      });
+    // await fetch(
+    //   "http://localhost:5000/api/product/product-details",
+    //   requestOptions
+    // )
+    // .then(async (response) => {
+    //   const data = await response.json();
 
-      // check for error response
-      if (!response.ok) {
-        // get error message from body or default to response status
-        const error = (data && data.message) || response.status;
-        return Promise.reject(error);
-      }
-
-      this.setState((prevState) => ({
-        product: {
-          ...prevState.product,
-          title: data.details.title,
-          urlProduct: data.details.productUrl,
-          urlPicture: data.details.imageUrl,
-          price: data.details.price,
-          rating: data.details.rating,
-          // numOfRatings: data.details.numOfRatings,
-          // ratingDetail: data.details.ratingDetail
-        },
-      }));
-    })
-    .catch((error) => {
-      this.setState({ errorMessage: error.toString() });
-      console.error("There was an error!", error);
-    });
+    //   // check for error response
+    //   if (!response.ok) {
+    //     // get error message from body or default to response status
+    //     const error = (data && data.message) || response.status;
+    //     return Promise.reject(error);
+    //   }
+    // })
+    // .catch((error) => {
+    //   this.setState({ errorMessage: error.toString() });
+    //   console.error("There was an error!", error);
+    // });
   }
 
   render() {
