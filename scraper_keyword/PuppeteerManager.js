@@ -111,7 +111,6 @@ class PuppeteerManager {
 						}
 					}
 
-
 					await this.executeCommand(page, commands[commandIndex]);
 
 				} catch (error) {
@@ -212,7 +211,7 @@ class PuppeteerManager {
 			case "getItemReviews" /* Selector: .shopee-product-rating */:
 				try {
 					this.productReviews = await frame.evaluate(async (command) => {
-						console.log(command.locatorCss);
+						// console.log(command.locatorCss);
 
 						try {
 							function wait(ms) {
@@ -345,6 +344,10 @@ class PuppeteerManager {
 							detail["title"] = document
 								.querySelectorAll("._3ZV7fL")[0]
 								.getElementsByTagName("span")[0].innerText;
+
+              // URL product
+							const productUrl = document.querySelectorAll("link");
+							detail["productUrl"] = productUrl[productUrl.length - 2].baseURI;
 
 							// URL image
 							const imgUrl = document.querySelector("._39-Tsj > div").getAttribute("style");

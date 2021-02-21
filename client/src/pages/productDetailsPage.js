@@ -28,7 +28,7 @@ export default class ProductDetailsPage extends React.Component {
 
   async componentDidMount() {
     const url =
-      "https://shopee.sg/-SG-Shipping-Ladybird-Key-Words-with-Peter-and-Jane-Box-Set-(36-Books)-i.147508069.2228555546";
+      "https://shopee.sg/%E3%80%90Same-Day-Delivery%E3%80%91-ASUS-Zenbook-14-UM425IA-AM092T-14inch-FHD-IPS-Ryzen-7-4700U-1TB-SSD-67Wh-2Y-ASUS-Warranty-i.51678844.7148374888";
     const requestOptionsDetails = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -89,28 +89,10 @@ export default class ProductDetailsPage extends React.Component {
         // if there's an error, log it
         console.log(error);
       });
-    // await fetch(
-    //   "http://localhost:5000/api/product/product-details",
-    //   requestOptions
-    // )
-    // .then(async (response) => {
-    //   const data = await response.json();
-
-    //   // check for error response
-    //   if (!response.ok) {
-    //     // get error message from body or default to response status
-    //     const error = (data && data.message) || response.status;
-    //     return Promise.reject(error);
-    //   }
-    // })
-    // .catch((error) => {
-    //   this.setState({ errorMessage: error.toString() });
-    //   console.error("There was an error!", error);
-    // });
   }
 
   render() {
-    return(
+    return (
       <div>
         {this.state.product.title ? (
           <React.Fragment>
@@ -133,9 +115,9 @@ export default class ProductDetailsPage extends React.Component {
               {/* Input score in range [-1, 1], input duration is in second */}
               <br />
               <RatingDetails
-                rating = {this.state.product.rating}
-                numOfRatings = {this.state.product.numOfRatings}
-                ratingDetail = {this.state.product.ratingDetail}
+                rating={this.state.product.rating}
+                numOfRatings={this.state.product.numOfRatings}
+                ratingDetail={this.state.product.ratingDetail}
               />
               <br />
             </section>
@@ -144,9 +126,15 @@ export default class ProductDetailsPage extends React.Component {
             </section>
           </React.Fragment>
         ) : (
-          <h1>Waiting...</h1>
+          // UI loading
+          <div class="container">
+            <div class="dash uno"></div>
+            <div class="dash dos"></div>
+            <div class="dash tres"></div>
+            <div class="dash cuatro"></div>
+          </div>
         )}
       </div>
-    )
+    );
   }
 }

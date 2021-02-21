@@ -1,1 +1,0 @@
-Endpoint for scraping product reviews
