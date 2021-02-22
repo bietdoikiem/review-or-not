@@ -92,7 +92,7 @@ const EmptyStar = () => {
 };
 
 /* Generate star bar by number of stars params */
-const DynamicStar = (star) => {
+const DynamicStar = (star) => { 
 	switch (star) {
 		case "rating5":
 			return (

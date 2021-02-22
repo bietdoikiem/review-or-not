@@ -30,7 +30,7 @@ router.post('/products/keyword', async (req, res) => {
         }
         await getProductsHandler(data).then(result => {
             let response = {
-                msg: 'retrieved products ',
+                msg: 'retrieved products',
                 hostname: os.hostname(),
                 products: result
             }
@@ -65,7 +65,7 @@ router.post('/product/product-reviews', async (req, res) => {
         
         await getProductReviewsHandler(req.body).then(result => {
             let response = {
-                msg: 'retrieved products ',
+                msg: 'retrieved products',
                 hostname: os.hostname(),
                 results: result
             }
@@ -97,7 +97,7 @@ router.post("/product/product-details", async (req, res) => {
 
     await getProductDetailsHandler(req.body).then((result) => {
       let response = {
-        msg: "retrieved products ",
+        msg: "retrieved products",
         hostname: os.hostname(),
         details: result,
       };
