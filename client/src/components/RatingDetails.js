@@ -20,9 +20,9 @@ const BarWrapper = styled.div`
 	box-sizing: border-box;
 	width: 100%;
 	height: 100px;
+	padding-top: 5px;
 	padding-right: 8px;
 	margin-top: 0px;
-	margin-bottom: 10px;
 `;
 
 const TotalWrapper = styled.div`

@@ -28,7 +28,7 @@ export default class ProductDetailsPage extends React.Component {
 
   async componentDidMount() {
     const url =
-      "https://shopee.sg/%E3%80%90Same-Day-Delivery%E3%80%91-ASUS-Zenbook-14-UM425IA-AM092T-14inch-FHD-IPS-Ryzen-7-4700U-1TB-SSD-67Wh-2Y-ASUS-Warranty-i.51678844.7148374888";
+      "https://shopee.sg/-SG-Shipping-Ladybird-Key-Words-with-Peter-and-Jane-Box-Set-(36-Books)-i.147508069.2228555546";
     const requestOptionsDetails = {
       method: "POST",
       headers: { "Content-Type": "application/json" },

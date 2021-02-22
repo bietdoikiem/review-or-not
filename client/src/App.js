@@ -24,7 +24,7 @@ function App() {
       </header>
       <Container maxWidth="lg">
         <main>
-          {/* <Homepage/> */}
+          {/* <Homepage /> */}
           <ProductDetailsPage />
         </main>
       </Container>
