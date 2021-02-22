@@ -61,15 +61,15 @@ const getProductsHandler = async ({url, commands, nrOfPages}) => {
 router.post('/product/product-reviews', async (req, res) => {
     req.setTimeout(timeout);
     try {
-        console.log(req.body);
+        // console.log(req.body);
         
         await getProductReviewsHandler(req.body).then(result => {
             let response = {
                 msg: 'retrieved products',
                 hostname: os.hostname(),
-                reviews: result
+                results: result
             }
-            console.log('Done!');
+            console.log('Done Product Reviews!');
             res.send(response);
         })
     } catch (error) {
@@ -101,7 +101,7 @@ router.post("/product/product-details", async (req, res) => {
         hostname: os.hostname(),
         details: result,
       };
-      console.log("Done!");
+      console.log("Done Product Details!");
       res.send(response);
     });
   } catch (error) {

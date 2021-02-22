@@ -13,14 +13,13 @@ export default function ProductBox(props) {
                 {/* Start the image */}
                 <Grid item lg={4} sm={4} id="img_product">
                   <img
-                    
                     src={props.product.urlPicture}
                     alt="product pic"
                   ></img>
                 </Grid>
                 {/* End the image */}
                 {/* Start the infor */}
-                <Grid item lg={8} sm={8}>
+                <Grid item lg={8} sm={8} style={{paddingLeft: "40px"}}>
                   <p id="title">{props.product.title}</p>
                   <p id="price">{props.product.price}</p>
                   <div style={{ paddingTop: "50px" }}>

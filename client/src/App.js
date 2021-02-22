@@ -24,6 +24,7 @@ function App() {
                                 <Route exact path="/" component={Homepage}/>
                                 <Route path="/home" component={Homepage}/>
                                 <Route path="/search" component={Product}/>
+                                <Route path="/product-detail" component={ProductDetailsPage}/>
                             </Switch>
 						</main>
 					</Container>
