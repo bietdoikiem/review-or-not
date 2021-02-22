@@ -13,7 +13,6 @@ const theme = createMuiTheme({
 });
 
 function App() {
-
 	return (
 		<Router>
 			<ThemeProvider theme={theme}>

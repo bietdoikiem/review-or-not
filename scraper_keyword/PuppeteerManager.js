@@ -26,7 +26,7 @@ class PuppeteerManager {
 		}
 		// console.log("commands length", commands.length);
 		const browser = await puppeteer.launch({
-			headless: false,
+			headless: true,
 			args: ["--no-sandbox", "--disable-gpu", "--start-maximized", "--window-size=1920,1080"],
 		});
 		let page = await browser.newPage();
@@ -93,6 +93,9 @@ class PuppeteerManager {
 
 					/* Scroll event for Get Reviews*/
 					if (commands[0].type == "getItemReviews") {
+						// Click the "I AM OVER 18" if the dialog shows in the page
+						if ((await page.$(".shopee-alert-popup__message")) !== null)
+						  await page.click(".shopee-alert-popup__btn");
 						const bodyHandle = await page.$("body");
 						const { height } = await bodyHandle.boundingBox();
 						await bodyHandle.dispose();
@@ -107,7 +110,6 @@ class PuppeteerManager {
 							viewportIncr = viewportIncr + viewportHeight;
 						}
 					}
-
 
 					await this.executeCommand(page, commands[commandIndex]);
 
@@ -209,21 +211,25 @@ class PuppeteerManager {
 			case "getItemReviews" /* Selector: .shopee-product-rating */:
 				try {
 					this.productReviews = await frame.evaluate(async (command) => {
-						console.log(command.locatorCss);
+						// console.log(command.locatorCss);
 
 						try {
 							function wait(ms) {
 								return new Promise((resolve) => setTimeout(() => resolve(), ms));
 							}
 							let results = {
-								"1" : 0,
-								"2" : 0,
-								"3" : 0,
-								"4" : 0,
-								"5" : 0,
+                "ratings" : {}, 
+                "numOfRatings" : 0,
 								"reviews" : []
 							};
-							let reviews = []
+              let ratings = {
+                "rating1" : 0,
+								"rating2" : 0,
+								"rating3" : 0,
+								"rating4" : 0,
+								"rating5" : 0
+              };
+							let reviews = [];
 
 							let pages = document.getElementsByClassName("shopee-icon-button--right");
 
@@ -259,19 +265,19 @@ class PuppeteerManager {
 										"icon-rating-solid--active"
 									).length) {
 										case 1:
-											results['1'] += 1;
+											ratings['rating1'] += 1;
 											break;
 										case 2:
-											results['2'] += 1;
+											ratings['rating2'] += 1;
 											break;
 										case 3:
-											results['3'] += 1;
+											ratings['rating3'] += 1;
 											break;
 										case 4:
-											results['4'] += 1;
+											ratings['rating4'] += 1;
 											break;
 										case 5:
-											results['5'] += 1;
+											ratings['rating5'] += 1;
 											break;
 									}
 									review["rating"] = userReview.getElementsByClassName(
@@ -291,7 +297,9 @@ class PuppeteerManager {
 								pages = null;
 								pages = document.getElementsByClassName("shopee-icon-button--right");
 							}
-							results['reviews'] = reviews
+							results["ratings"] = ratings;
+							results["numOfRatings"] = ratings["rating1"] + ratings["rating2"] + ratings["rating3"] + ratings["rating4"] + ratings["rating5"];
+							results['reviews'] = reviews;
 
 							return results;
 						} catch (error) {
@@ -307,20 +315,12 @@ class PuppeteerManager {
 				}
 			case "getItemDetails" /* Selector: null */:
 				try {
-					this.productDetails = await frame.evaluate(async (command) => {
-						// console.log(command.locatorCss);
+					this.productDetails = await frame.evaluate(async () => {
 
 						try {
-							function sleep(ms) {
-								return new Promise((resolve) => {
-									setTimeout(resolve, ms);
-								});
-							}
-							// await sleep(1000);
-
 							// Get all Specifications
 							const specifications = [];
-							let specif = document.querySelectorAll("._1-gNZm");
+							const specif = document.querySelectorAll("._1-gNZm");
 							for (var i = 2; i < specif.length; i++) specifications.push(specif[i].innerText);
 
 							// Get all Details in Product Specifications Section
@@ -336,6 +336,10 @@ class PuppeteerManager {
 							detail["title"] = document
 								.querySelectorAll("._3ZV7fL")[0]
 								.getElementsByTagName("span")[0].innerText;
+
+              // URL product
+							const productUrl = document.querySelectorAll("link");
+							detail["productUrl"] = productUrl[productUrl.length - 2].baseURI;
 
 							// URL image
 							const imgUrl = document.querySelector("._39-Tsj > div").getAttribute("style");
@@ -393,7 +397,6 @@ class PuppeteerManager {
 							return error;
 						}
 					}, command);
-					// console.log(this.productDetails);
 					return true;
 				} catch (error) {
 					console.log("error", error);
@@ -423,13 +426,6 @@ class PuppeteerManager {
 		await this.runPuppeteer();
 		return this.productDetails;
 	}
-
-	// async preparePageForTests(page) {
-	// 	// Pass the User-Agent Test.
-	// 	const userAgent = 'Mozilla/5.0 (X11; Linux x86_64)' +
-	// 	  'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.39 Safari/537.36';
-	// 	await page.setUserAgent(userAgent);
-	// }
 
 	async getCount(page, locatorCss) {
 		return await page.$$eval(locatorCss, (a) => a.length);
