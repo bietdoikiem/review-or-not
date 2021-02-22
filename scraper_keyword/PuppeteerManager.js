@@ -297,9 +297,9 @@ class PuppeteerManager {
 								pages = null;
 								pages = document.getElementsByClassName("shopee-icon-button--right");
 							}
-              results["ratings"] = ratings;
-              results["numOfRatings"] = ratings["rating1"] + ratings["rating2"] + ratings["rating3"] + ratings["rating4"] + ratings["rating5"];
-              results['reviews'] = reviews;
+							results["ratings"] = ratings;
+							results["numOfRatings"] = ratings["rating1"] + ratings["rating2"] + ratings["rating3"] + ratings["rating4"] + ratings["rating5"];
+							results['reviews'] = reviews;
 
 							return results;
 						} catch (error) {
@@ -316,19 +316,11 @@ class PuppeteerManager {
 			case "getItemDetails" /* Selector: null */:
 				try {
 					this.productDetails = await frame.evaluate(async () => {
-						// console.log(command.locatorCss);
 
 						try {
-							function sleep(ms) {
-								return new Promise((resolve) => {
-									setTimeout(resolve, ms);
-								});
-							}
-							// await sleep(1000);
-
 							// Get all Specifications
 							const specifications = [];
-							let specif = document.querySelectorAll("._1-gNZm");
+							const specif = document.querySelectorAll("._1-gNZm");
 							for (var i = 2; i < specif.length; i++) specifications.push(specif[i].innerText);
 
 							// Get all Details in Product Specifications Section
@@ -405,7 +397,6 @@ class PuppeteerManager {
 							return error;
 						}
 					}, command);
-					// console.log(this.productDetails);
 					return true;
 				} catch (error) {
 					console.log("error", error);
@@ -435,13 +426,6 @@ class PuppeteerManager {
 		await this.runPuppeteer();
 		return this.productDetails;
 	}
-
-	// async preparePageForTests(page) {
-	// 	// Pass the User-Agent Test.
-	// 	const userAgent = 'Mozilla/5.0 (X11; Linux x86_64)' +
-	// 	  'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.39 Safari/537.36';
-	// 	await page.setUserAgent(userAgent);
-	// }
 
 	async getCount(page, locatorCss) {
 		return await page.$$eval(locatorCss, (a) => a.length);

@@ -19,9 +19,9 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
     <div className="App">
-              <header id="head">
+      <header id="head">
           
-          </header>
+      </header>
       <Container maxWidth="lg">
         <main>
           {/* <Homepage/> */}

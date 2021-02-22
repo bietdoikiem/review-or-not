@@ -81,6 +81,7 @@ export default function Product(props) {
                     <img
                       className="product-image"
                       src="https://exacdn.acfc.com.vn/media/catalog/product/cache/1590496433db240c9566f569680d296c/b/c/bc65c_cn18754670.jpg"
+                      alt="product-img"
                     />
                   </div>
                   <div>
