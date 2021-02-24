@@ -7,8 +7,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import SearchBar from "../components/SearchBar";
-import { Link } from "react-router-dom";
-import { createMuiTheme, makeStyles,ThemeProvider } from "@material-ui/core/styles";
+import { createMuiTheme, makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import "./product.css";
 import queryString from "query-string";
@@ -127,6 +126,7 @@ export default function Product(props) {
 		setStaticParam(obj.keyword);
 	};
 
+	// fetch product by URL and set result to component's state
 	const fetchAndSetState = useCallback(async () => {
 		const result = await fetchProductsByKeyword(URL);
 		setFetchResult(result.data);
