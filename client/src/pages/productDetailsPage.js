@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter as Router, useLocation } from "react-router-dom";
 
 import SentimentGauge from "../components/SentimentGauge";
 import ReviewCategoryBox from "../components/ReviewCategoryBox";
@@ -9,7 +10,20 @@ import RatingDetails from "../components/RatingDetails";
 
 import "./productDetailsPage.css";
 
+function QueryParamsDemo() {
+  let query = new URLSearchParams(useLocation().search);
+  let demo = query.get("url");
+  return demo;
+}
+
+function getUrl() {
+  const newUrl = QueryParamsDemo();
+  return newUrl;
+}
+
 export default class ProductDetailsPage extends React.Component {
+  productURL = null;
+
   constructor(props) {
     super(props);
 
@@ -21,19 +35,24 @@ export default class ProductDetailsPage extends React.Component {
         price: null,
         rating: null,
         numOfRatings: null,
-        ratingDetail: null
+        ratingDetail: null,
       },
     };
   }
 
+  async update() {
+    this.productURL = getUrl();
+  }
+
   async componentDidMount() {
+    const hello = this.productURL;
     const url =
-      "https://shopee.sg/-SG-Shipping-Ladybird-Key-Words-with-Peter-and-Jane-Box-Set-(36-Books)-i.147508069.2228555546";
+      "https://shopee.sg/%E3%80%90Same-Day-Delivery%E3%80%91-ASUS-Zenbook-14-UM425IA-AM092T-14inch-FHD-IPS-Ryzen-7-4700U-1TB-SSD-67Wh-2Y-ASUS-Warranty-i.51678844.7148374888";
     const requestOptionsDetails = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        url: url,
+        url: hello,
         nrOfPages: 1,
         commands: [
           {
@@ -48,7 +67,7 @@ export default class ProductDetailsPage extends React.Component {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        url: url,
+        url: hello,
         nrOfPages: 1,
         commands: [
           {
@@ -60,8 +79,14 @@ export default class ProductDetailsPage extends React.Component {
       }),
     };
     Promise.all([
-      fetch("http://localhost:5000/api/product/product-details", requestOptionsDetails),
-      fetch("http://localhost:5000/api/product/product-reviews", requestOptionsReviews),
+      fetch(
+        "http://localhost:5000/api/product/product-details",
+        requestOptionsDetails
+      ),
+      fetch(
+        "http://localhost:5000/api/product/product-reviews",
+        requestOptionsReviews
+      ),
     ])
       .then(function (responses) {
         // Get a JSON object from each of the responses
@@ -81,7 +106,7 @@ export default class ProductDetailsPage extends React.Component {
             price: data[0].details.price,
             rating: data[0].details.rating,
             numOfRatings: data[1].results.numOfRatings,
-            ratingDetail: data[1].results.ratings
+            ratingDetail: data[1].results.ratings,
           },
         }));
       })
@@ -94,6 +119,7 @@ export default class ProductDetailsPage extends React.Component {
   render() {
     return (
       <div>
+        <QueryParamsDemo />
         {this.state.product.title ? (
           <React.Fragment>
             {/* Start Breadcrumb */}

@@ -26,7 +26,7 @@ class PuppeteerManager {
 		}
 		// console.log("commands length", commands.length);
 		const browser = await puppeteer.launch({
-			headless: true,
+			headless: false,
 			args: ["--no-sandbox", "--disable-gpu", "--start-maximized", "--window-size=1920,1080"],
 		});
 		let page = await browser.newPage();
