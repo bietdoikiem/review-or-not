@@ -7,25 +7,30 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import SearchBar from "../components/SearchBar";
-import { Link } from "react-router-dom";
 import { createMuiTheme, makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import "./product.css";
 import queryString from "query-string";
 import axios from "axios";
 
-// const useStyles = makeStyles({
-// 	root: {
-// 	  "&:hover": {
-// 		  backgroundColor:
-// 	  },
-
-// 	},
-//   });
-
-function navigateComponent(link) {
-	return <a style={{ textDecoration: "none" }}></a>;
-}
+const useStyles = makeStyles(() => ({
+	/* Styles applied to root element */
+	root: {
+		// default root styles
+		color: 'inherit',
+		display: 'table-row',
+		verticleAlign: 'middle',
+		// Disable focus ring
+		outline: 0,
+		'&$hover:hover': {
+			// set hover color
+			backgroundColor: '#FFE9D6'
+		}
+	},
+	/* Pseudo-class applied to root element if hover = true */
+	hover: {},
+}));
+  
 
 function feedback(value) {
 	switch (value) {
@@ -65,6 +70,9 @@ const theme = createMuiTheme({
 const URL = "https://shopee.sg/search?keyword=";
 
 export default function Product(props) {
+	
+	const classes = useStyles();
+
 	// keyword input in the search bar
 	const [keyword, setKeyword] = useState("");
 	// current statical keyword param from fetched query
@@ -118,6 +126,7 @@ export default function Product(props) {
 		setStaticParam(obj.keyword);
 	};
 
+	// fetch product by URL and set result to component's state
 	const fetchAndSetState = useCallback(async () => {
 		const result = await fetchProductsByKeyword(URL);
 		setFetchResult(result.data);
@@ -172,6 +181,9 @@ export default function Product(props) {
 								Rating
 							</TableCell>
 							<TableCell className="table-head" align="right">
+								Sold
+							</TableCell>
+							<TableCell className="table-head" align="right">
 								Site
 							</TableCell>
 							<TableCell className="table-head" align="right">
@@ -186,7 +198,7 @@ export default function Product(props) {
 						{fetchResult ? (
 							<React.Fragment>
 								{fetchResult.products.map((row, index) => (
-									<TableRow hover key={index}>
+									<TableRow classes={classes} hover key={index}>
 										<TableCell className="product-cell" scope="row">
 											<div style={{ width: "100%" }}>
 												<a
@@ -207,9 +219,10 @@ export default function Product(props) {
 												</a>
 											</div>
 										</TableCell>
-										
+
 										<TableCell align="right">${row.price}</TableCell>
 										<TableCell align="right">{row.ratings}</TableCell>
+										<TableCell align="right">{row.soldUnit}</TableCell>
 										<TableCell align="right">Shopee (SG)</TableCell>
 										<TableCell align="right">{row.discount}</TableCell>
 										{feedback("Positive")}

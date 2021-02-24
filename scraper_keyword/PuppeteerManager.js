@@ -163,11 +163,11 @@ class PuppeteerManager {
 										let productTitle = await item
 											.querySelector("._1NoI8_.A6gE1J._1co5xN")
 											.innerText.trim();
-										let price = await item.querySelector("._1xk7ak").innerText.trim();
+										let price = await item.querySelector("._1xk7ak").innerText;
 										let ratings = await item.querySelectorAll(".shopee-rating-stars__star-wrapper");
 										let discountPercent = (await item
 											.querySelector("span.percent"))
-											? item.querySelector("span.percent").innerText.trim()
+											? item.querySelector("span.percent").innerText
 											: "0%";
 										await ratings.forEach(async (star) => {
 											let width = star
@@ -180,6 +180,8 @@ class PuppeteerManager {
 											}
 										});
 										let actualRating = await convertStar(ratingList);
+										let soldUnit = await item.querySelector("._245-SC").innerText.replace("sold", "").trim();
+										soldUnit = soldUnit ? soldUnit : 0;
 										let product = {
 											productTitle: productTitle,
 											price: parseFloat(price.replace(/,/g, "")),
@@ -187,6 +189,7 @@ class PuppeteerManager {
 											imageUrl: imageUrl,
 											ratings: actualRating,
 											discount: discountPercent,
+											soldUnit: soldUnit
 										};
 										// console.log(product);
 										parsedItems.push(product);
