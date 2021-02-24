@@ -7,23 +7,12 @@ import ProductBox from "../components/productBox";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Link from "@material-ui/core/Link";
 import RatingDetails from "../components/RatingDetails";
-
+import queryString from 'query-string'
 import "./productDetailsPage.css";
 
-function QueryParamsDemo() {
-  let query = new URLSearchParams(useLocation().search);
-  let demo = query.get("url");
-  return demo;
-}
 
-function getUrl() {
-  const newUrl = QueryParamsDemo();
-  return newUrl;
-}
 
 export default class ProductDetailsPage extends React.Component {
-  productURL = null;
-
   constructor(props) {
     super(props);
 
@@ -37,22 +26,37 @@ export default class ProductDetailsPage extends React.Component {
         numOfRatings: null,
         ratingDetail: null,
       },
+      productURL: ""
     };
   }
 
-  async update() {
-    this.productURL = getUrl();
-  }
+  // QueryParamsDemo() {
+  //   let query = new URLSearchParams(useLocation().search);
+  //   let demo = query.get("url");
+  //   return demo;
+  // }
+  
+  // getUrl() {
+  //   const newUrl = QueryParamsDemo();
+  //   return newUrl;
+  // }
+
+  // async update() {
+  //   this.productURL = getUrl();
+  // }
 
   async componentDidMount() {
-    const hello = this.productURL;
-    const url =
-      "https://shopee.sg/%E3%80%90Same-Day-Delivery%E3%80%91-ASUS-Zenbook-14-UM425IA-AM092T-14inch-FHD-IPS-Ryzen-7-4700U-1TB-SSD-67Wh-2Y-ASUS-Warranty-i.51678844.7148374888";
+    const query = new URLSearchParams(this.props.location.search);
+    const url = query.get('url')
+    console.log(url) // Check url
+    await this.setState({productURL:url})
+    // const url =
+    //   "https://shopee.sg/%E3%80%90Same-Day-Delivery%E3%80%91-ASUS-Zenbook-14-UM425IA-AM092T-14inch-FHD-IPS-Ryzen-7-4700U-1TB-SSD-67Wh-2Y-ASUS-Warranty-i.51678844.7148374888";
     const requestOptionsDetails = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        url: hello,
+        url: this.state.productURL,
         nrOfPages: 1,
         commands: [
           {
@@ -67,7 +71,7 @@ export default class ProductDetailsPage extends React.Component {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        url: hello,
+        url: this.state.productURL,
         nrOfPages: 1,
         commands: [
           {
@@ -119,7 +123,7 @@ export default class ProductDetailsPage extends React.Component {
   render() {
     return (
       <div>
-        <QueryParamsDemo />
+        {/* <QueryParamsDemo /> */}
         {this.state.product.title ? (
           <React.Fragment>
             {/* Start Breadcrumb */}
