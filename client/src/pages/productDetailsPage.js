@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter as Router, useLocation } from "react-router-dom";
 
 import SentimentGauge from "../components/SentimentGauge";
 import ReviewCategoryBox from "../components/ReviewCategoryBox";
@@ -6,7 +7,7 @@ import ProductBox from "../components/productBox";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Link from "@material-ui/core/Link";
 import RatingDetails from "../components/RatingDetails";
-
+import queryString from 'query-string'
 import "./productDetailsPage.css";
 
 export default class ProductDetailsPage extends React.Component {
@@ -21,74 +22,61 @@ export default class ProductDetailsPage extends React.Component {
         price: null,
         rating: null,
         numOfRatings: null,
-        ratingDetail: null
+        ratingDetail: null,
       },
+      productURL: ""
     };
   }
 
   async componentDidMount() {
-    const url =
-      "https://shopee.sg/-SG-Shipping-Ladybird-Key-Words-with-Peter-and-Jane-Box-Set-(36-Books)-i.147508069.2228555546";
-    const requestOptionsDetails = {
+    const query = new URLSearchParams(this.props.location.search);
+    const url = query.get('url')
+    await this.setState({productURL:url})
+    const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        url: url,
-        nrOfPages: 1,
-        commands: [
-          {
-            description: null,
-            locatorCss: null,
-            type: "getItemDetails",
-          },
-        ],
-      }),
-    };
-    const requestOptionsReviews = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        url: url,
+        url: this.state.productURL,
         nrOfPages: 1,
         commands: [
           {
             description: null,
             locatorCss: ".shopee-product-rating",
-            type: "getItemReviews",
+            type: "getItemDetails",
           },
         ],
       }),
     };
-    Promise.all([
-      fetch("http://localhost:5000/api/product/product-details", requestOptionsDetails),
-      fetch("http://localhost:5000/api/product/product-reviews", requestOptionsReviews),
-    ])
-      .then(function (responses) {
-        // Get a JSON object from each of the responses
-        return Promise.all(
-          responses.map(function (response) {
-            return response.json();
-          })
-        );
-      })
-      .then((data) => {
+    await fetch(
+      "http://localhost:5000/api/product/product-details",
+      requestOptions
+    )
+      .then(async (response) => {
+        const data = await response.json();
+        console.log(data.details);
+
+        // check for error response
+        if (!response.ok) {
+          // get error message from body or default to response status
+          const error = (data && data.message) || response.status;
+          return Promise.reject(error);
+        }
         this.setState((prevState) => ({
-          product: {
-            ...prevState.product,
-            title: data[0].details.title,
-            urlProduct: data[0].details.productUrl,
-            urlPicture: data[0].details.imageUrl,
-            price: data[0].details.price,
-            rating: data[0].details.rating,
-            numOfRatings: data[1].results.numOfRatings,
-            ratingDetail: data[1].results.ratings
-          },
-        }));
-      })
-      .catch(function (error) {
-        // if there's an error, log it
-        console.log(error);
-      });
+        product: {
+          ...prevState.product,
+          title: data.details.title,
+          urlPicture: data.details.imageUrl,
+          price: data.details.price,
+          rating: data.details.rating,
+          numOfRatings: data.details.numOfRatings,
+          ratingDetail: data.details.ratingDetail
+        },
+      }));
+    })
+    .catch((error) => {
+      this.setState({ errorMessage: error.toString() });
+      console.error("There was an error!", error);
+    });
   }
 
   render() {
