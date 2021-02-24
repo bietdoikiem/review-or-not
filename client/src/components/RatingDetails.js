@@ -157,6 +157,10 @@ const DynamicStar = (star) => {
 	}
 };
 
+function changeNumber() {
+	
+}
+
 const RatingDetails = (props) => {
 	const [mapRating, setMapRating] = useState(null);
 

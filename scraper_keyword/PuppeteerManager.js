@@ -26,7 +26,7 @@ class PuppeteerManager {
 		}
 		// console.log("commands length", commands.length);
 		const browser = await puppeteer.launch({
-			headless: false,
+			headless: true,
 			args: ["--no-sandbox", "--disable-gpu", "--start-maximized", "--window-size=1920,1080"],
 		});
 		let page = await browser.newPage();
@@ -92,7 +92,6 @@ class PuppeteerManager {
 					let frames = await page.frames();
 
 					/* Scroll event for Get Reviews*/
-					if (commands[0].type == "getItemReviews") {
 						// Click the "I AM OVER 18" if the dialog shows in the page
 						if ((await page.$(".shopee-alert-popup__message")) !== null)
 						  await page.click(".shopee-alert-popup__btn");
@@ -109,7 +108,7 @@ class PuppeteerManager {
 							await this.sleep(1500);
 							viewportIncr = viewportIncr + viewportHeight;
 						}
-					}
+					
 
 					await this.executeCommand(page, commands[commandIndex]);
 
@@ -209,30 +208,15 @@ class PuppeteerManager {
 					return false;
 				}
 			case "getItemReviews" /* Selector: .shopee-product-rating */:
-				try {
+try {
 					this.productReviews = await frame.evaluate(async (command) => {
-						// console.log(command.locatorCss);
-
+						console.log(command.locatorCss);
 						try {
 							function wait(ms) {
 								return new Promise((resolve) => setTimeout(() => resolve(), ms));
 							}
-							let results = {
-                "ratings" : {}, 
-                "numOfRatings" : 0,
-								"reviews" : []
-							};
-              let ratings = {
-                "rating1" : 0,
-								"rating2" : 0,
-								"rating3" : 0,
-								"rating4" : 0,
-								"rating5" : 0
-              };
-							let reviews = [];
-
+							let results = [];
 							let pages = document.getElementsByClassName("shopee-icon-button--right");
-
 							let trackingPage = 1;
 							let nextPage = 1;
 							// Condition checking if there are reviews for the product
@@ -245,7 +229,6 @@ class PuppeteerManager {
 									review["author"] = userReview.getElementsByClassName(
 										"shopee-product-rating__author-name"
 									)[0].innerText; // Add review author
-
 									review["time"] = userReview.getElementsByClassName(
 										"shopee-product-rating__time"
 									)[0].innerText;
@@ -257,35 +240,14 @@ class PuppeteerManager {
 										let a = reviewVariation.innerText.replace("Variation: ", "").split(",");
 										review["variation"] = a; // Add review variation
 									}
-
 									review["content"] = userReview.getElementsByClassName(
 										"shopee-product-rating__content"
 									)[0].innerText; // Add review content
-									switch(userReview.getElementsByClassName(
-										"icon-rating-solid--active"
-									).length) {
-										case 1:
-											ratings['rating1'] += 1;
-											break;
-										case 2:
-											ratings['rating2'] += 1;
-											break;
-										case 3:
-											ratings['rating3'] += 1;
-											break;
-										case 4:
-											ratings['rating4'] += 1;
-											break;
-										case 5:
-											ratings['rating5'] += 1;
-											break;
-									}
 									review["rating"] = userReview.getElementsByClassName(
 										"icon-rating-solid--active"
 									).length; // Add review rating
-									reviews.push(review); // Add to the result list
+									results.push(review); // Add to the result list
 								}
-
 								await pages[0].click();
 								trackingPage = parseInt(
 									document.getElementsByClassName(
@@ -297,10 +259,6 @@ class PuppeteerManager {
 								pages = null;
 								pages = document.getElementsByClassName("shopee-icon-button--right");
 							}
-							results["ratings"] = ratings;
-							results["numOfRatings"] = ratings["rating1"] + ratings["rating2"] + ratings["rating3"] + ratings["rating4"] + ratings["rating5"];
-							results['reviews'] = reviews;
-
 							return results;
 						} catch (error) {
 							console.log(error);
@@ -318,81 +276,121 @@ class PuppeteerManager {
 					this.productDetails = await frame.evaluate(async () => {
 
 						try {
-							// Get all Specifications
-							const specifications = [];
-							const specif = document.querySelectorAll("._1-gNZm");
-							for (var i = 2; i < specif.length; i++) specifications.push(specif[i].innerText);
+							// Change number if containing "k" character
+							function changeNum(string) {
+								if(string.includes("k")) {
+									const numString = string.slice(0, -1);
+									return (parseFloat(numString) * 1000);
+								}
+								else return (parseFloat(string));
+							}
 
-							// Get all Details in Product Specifications Section
-							const details = [];
-							const det = document.querySelectorAll("._2gVYdB > div");
-							for (var i = 1; i < det.length; i++) details.push(det[i].innerText);
+              // Get all Specifications
+              const specifications = [];
+              const specif = document.querySelectorAll("._1-gNZm");
+              for (var i = 2; i < specif.length; i++)
+                specifications.push(specif[i].innerText);
 
-							// Array to hold all our results
-							let detail = {};
+              // Get all Details in Product Specifications Section
+              const details = [];
+              const det = document.querySelectorAll("._2gVYdB > div");
+              for (var i = 1; i < det.length; i++)
+                details.push(det[i].innerText);
 
-							// Take each element and store it
-							// Title
-							detail["title"] = document
-								.querySelectorAll("._3ZV7fL")[0]
-								.getElementsByTagName("span")[0].innerText;
+              // Array to hold all our results
+              let detail = {};
+
+              // Take each element and store it
+              // Title
+              detail["title"] = document
+                .querySelectorAll("._3ZV7fL")[0]
+                .getElementsByTagName("span")[0].innerText;
 
               // URL product
-							const productUrl = document.querySelectorAll("link");
-							detail["productUrl"] = productUrl[productUrl.length - 2].baseURI;
+              const productUrl = document.querySelectorAll("link");
+              detail["productUrl"] = productUrl[productUrl.length - 2].baseURI;
 
-							// URL image
-							const imgUrl = document.querySelector("._39-Tsj > div").getAttribute("style");
-							detail["imageUrl"] = imgUrl.substring(23, imgUrl.indexOf(")") - 1);
+              // URL image
+              const imgUrl = document
+                .querySelector("._39-Tsj > div")
+                .getAttribute("style");
+              detail["imageUrl"] = imgUrl.substring(
+                23,
+                imgUrl.indexOf(")") - 1
+              );
 
-							// Rating - 2 conditions to check if there are ratings or not
-							if (document.querySelector("._3WXigY") !== null)
+              // Rating details
+              if (document.querySelector("._3WXigY") !== null) {
 								detail["rating"] = parseFloat(document.querySelectorAll("._3WXigY")[0].innerText);
-							else detail["rating"] = null;
-
-							// Price
-							detail["price"] = document.querySelectorAll(".AJyN7v")[0].innerText;
-
-							// Category
-							let cates = document.querySelectorAll("._2gVYdB > ._1qYtEg > a");
-							detail["category"] = [];
-							for (var i = 1; i < cates.length; i++) detail["category"].push(cates[i].innerText);
-
-							// Brand
-							detail["brand"] = document.querySelectorAll("._3yEY86")[0].innerText;
-							if (detail["brand"] == "No Brand") detail["brand"] = null;
-
-							// Stock
-							for (var i = 0; i < specifications.length; i++) {
-								if (specifications[i] == "Stock") {
-									detail["stock"] = parseInt(details[details.length - specifications.length + i]);
-									details.splice(details.length - specifications.length + i, 1);
-									specifications.splice(i, 1);
-									break;
-								}
+								detail["numOfRatings"] = changeNum(document.querySelectorAll("._3WXigY")[1].innerText);
+								detail["ratingDetail"] = {};
+								const ratings = document.querySelectorAll(".product-rating-overview__filter");
+								detail["ratingDetail"]["rating1"] = changeNum(ratings[5].innerText.substring(8, ratings[5].innerText.length-1));
+								detail["ratingDetail"]["rating2"] = changeNum(ratings[4].innerText.substring(8, ratings[4].innerText.length-1));
+								detail["ratingDetail"]["rating3"] = changeNum(ratings[3].innerText.substring(8, ratings[3].innerText.length-1));
+								detail["ratingDetail"]["rating4"] = changeNum(ratings[2].innerText.substring(8, ratings[2].innerText.length-1));
+								detail["ratingDetail"]["rating5"] = changeNum(ratings[1].innerText.substring(8, ratings[1].innerText.length-1));
 							}
-
-							// Other specifications
-							if (details.length == 0) detail["specification"] = null;
 							else {
-								detail["specification"] = {};
-								for (var i = details.length - 1; i >= 0; i--) {
-									index = details.length - 1 - i;
-									detail["specification"][
-										specifications[specifications.length - details.length + i].toLowerCase()
-									] = details[i];
-								}
-								if (specifications.length != details.length)
-									detail["specification"]["model"] = document.querySelectorAll(
-										"._3yEY86"
-									)[1].innerText;
-							}
+                detail["rating"] = null;
+                detail["numOfRatings"] = null;
+                detail["ratingDetail"] = null;
+              }
 
-							// Description
-							detail["description"] = document.querySelector("._36_A1j > span").innerText;
+              // Price
+              detail["price"] = document.querySelectorAll(
+                ".AJyN7v"
+              )[0].innerText;
 
-							return detail;
-						} catch (error) {
+              // Category
+              let cates = document.querySelectorAll("._2gVYdB > ._1qYtEg > a");
+              detail["category"] = [];
+              for (var i = 1; i < cates.length; i++)
+                detail["category"].push(cates[i].innerText);
+
+              // Brand
+              detail["brand"] = document.querySelectorAll(
+                "._3yEY86"
+              )[0].innerText;
+              if (detail["brand"] == "No Brand") detail["brand"] = null;
+
+              // Stock
+              for (var i = 0; i < specifications.length; i++) {
+                if (specifications[i] == "Stock") {
+                  detail["stock"] = parseInt(
+                    details[details.length - specifications.length + i]
+                  );
+                  details.splice(details.length - specifications.length + i, 1);
+                  specifications.splice(i, 1);
+                  break;
+                }
+              }
+
+              // Other specifications
+              if (details.length == 0) detail["specification"] = null;
+              else {
+                detail["specification"] = {};
+                for (var i = details.length - 1; i >= 0; i--) {
+                  index = details.length - 1 - i;
+                  detail["specification"][
+                    specifications[
+                      specifications.length - details.length + i
+                    ].toLowerCase()
+                  ] = details[i];
+                }
+                if (specifications.length != details.length)
+                  detail["specification"]["model"] = document.querySelectorAll(
+                    "._3yEY86"
+                  )[1].innerText;
+              }
+
+              // Description
+              detail["description"] = document.querySelector(
+                "._36_A1j > span"
+              ).innerText;
+
+              return detail;
+            } catch (error) {
 							console.log(error);
 							return error;
 						}
