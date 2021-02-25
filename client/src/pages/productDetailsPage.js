@@ -10,6 +10,51 @@ import RatingDetails from "../components/RatingDetails";
 import queryString from 'query-string'
 import "./productDetailsPage.css";
 
+const LoadingUI = () => {
+  return (
+    <div>
+            <div className="loader">
+              <div className="l_main">
+                <div className="l_square">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <div className="l_square">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <div className="l_square">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <div className="l_square">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+            <div className="container">
+              <div className="preloader-2" style={{ padding: "200px" }}>
+                <span className="line line-1"></span>
+                <span className="line line-2"></span>
+                <span className="line line-3"></span>
+                <span className="line line-4"></span>
+                <span className="line line-5"></span>
+                <span className="line line-6"></span>
+                <span className="line line-7"></span>
+                <span className="line line-8"></span>
+                <span className="line line-9"></span>
+                <div>Loading</div>
+              </div>
+            </div>
+          </div>
+  );
+};
+
 export default class ProductDetailsPage extends React.Component {
   constructor(props) {
     super(props);
@@ -120,46 +165,7 @@ export default class ProductDetailsPage extends React.Component {
           </React.Fragment>
         ) : (
           // UI loading
-          <div>
-            <div className="loader">
-              <div className="l_main">
-                <div className="l_square">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-                <div className="l_square">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-                <div className="l_square">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-                <div className="l_square">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </div>
-            </div>
-            <div className="container">
-              <div className="preloader-2" style={{ padding: "200px" }}>
-                <span className="line line-1"></span>
-                <span className="line line-2"></span>
-                <span className="line line-3"></span>
-                <span className="line line-4"></span>
-                <span className="line line-5"></span>
-                <span className="line line-6"></span>
-                <span className="line line-7"></span>
-                <span className="line line-8"></span>
-                <span className="line line-9"></span>
-                <div>Loading</div>
-              </div>
-            </div>
-          </div>
+          <LoadingUI />
         )}
       </div>
     );

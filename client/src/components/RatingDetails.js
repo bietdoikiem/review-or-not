@@ -157,8 +157,11 @@ const DynamicStar = (star) => {
 	}
 };
 
-function changeNumber() {
-	
+/* Change the display if the number is higher or equal to 1000 */
+function changeNumber(num) {
+	if(num>=1000) 
+		return String(num/1000) + "k"
+	return num;
 }
 
 const RatingDetails = (props) => {
@@ -183,7 +186,7 @@ const RatingDetails = (props) => {
 								<NumOfRatingWrapper>
 									<span style={{ fontSize: "14px" }}>
 										{" "}
-										{`(${props.numOfRatings} ratings)`}
+										{`(${changeNumber(props.numOfRatings)} ratings)`}
 									</span>
 								</NumOfRatingWrapper>
 							</React.Fragment>
@@ -205,7 +208,7 @@ const RatingDetails = (props) => {
 												<React.Fragment>
 													{DynamicStar(r)} {/* Rating bar specified by dict key */}
 													<span style={{ color: "#787878", fontSize: "13px", marginLeft: "4px" }}>
-														({mapRating[r]})
+														({changeNumber(mapRating[r])})
 													</span>
 													<RatingBar key={r} pct={mapRating[r]/props.numOfRatings*100}>
 														<div></div>
