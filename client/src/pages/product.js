@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -7,6 +7,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import SearchBar from "../components/SearchBar";
+import {Link} from 'react-router-dom';
 import { createMuiTheme, makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import "./product.css";
@@ -67,11 +68,16 @@ const theme = createMuiTheme({
 	},
 });
 
-const URL = "https://shopee.sg/search?keyword=";
+const SHOPEE_URL = "https://shopee.sg/search?keyword=";
 
+
+// Product search results page
 export default function Product(props) {
 	
+	// useStyles classes
 	const classes = useStyles();
+	// cancelToken declaration
+	let cancelToken = useRef(null);
 
 	// keyword input in the search bar
 	const [keyword, setKeyword] = useState("");
@@ -101,6 +107,12 @@ export default function Product(props) {
 	const fetchProductsByKeyword = useCallback(
 		async (url) => {
 			try {
+				console.log('times executing')
+				if (cancelToken.current !== null) {
+					cancelToken.current.cancel("Operation canceled due to new request.");
+					// console.log(cancelToken.current);
+				}
+				cancelToken.current = axios.CancelToken.source();
 				const result = await axios.post("/api/products/keyword", {
 					url: `${url}${staticParam}`,
 					commands: [
@@ -110,7 +122,8 @@ export default function Product(props) {
 						},
 					],
 					nrOfPages: 1,
-				});
+				},
+				{ cancelToken: cancelToken.current.token });
 				return result;
 			} catch (error) {
 				console.log(error);
@@ -128,8 +141,12 @@ export default function Product(props) {
 
 	// fetch product by URL and set result to component's state
 	const fetchAndSetState = useCallback(async () => {
-		const result = await fetchProductsByKeyword(URL);
-		setFetchResult(result.data);
+		const result = await fetchProductsByKeyword(SHOPEE_URL);
+		// Cancellation may results in "undefined" data
+		// check if the result is undefined or not
+		if (result !== undefined) {
+			setFetchResult(result.data);
+		}
 	}, [fetchProductsByKeyword]);
 
 	// USE EFFECT HANDLERS //
@@ -142,7 +159,7 @@ export default function Product(props) {
 	// fetch result and set states on component mount
 	useEffect(() => {
 		if (staticParam !== "") {
-			console.log(staticParam);
+			console.log(`fetched params: '${staticParam}'`);
 			// const result = fetchProductsByKeyword(URL);
 			// setFetchResult(result.data);
 			fetchAndSetState();
@@ -197,13 +214,14 @@ export default function Product(props) {
 					<TableBody>
 						{fetchResult ? (
 							<React.Fragment>
+								{/* Display product search results */}
 								{fetchResult.products.map((row, index) => (
 									<TableRow classes={classes} hover key={index}>
 										<TableCell className="product-cell" scope="row">
 											<div style={{ width: "100%" }}>
-												<a
+												<Link
 													style={{ color: "#000", textDecoration: "none" }}
-													href={row.link}
+													to={`/product-details?url=${row.link}`}
 													target="_"
 												>
 													<div>
@@ -216,10 +234,10 @@ export default function Product(props) {
 													<div>
 														<p className="product-name">{row.productTitle}</p>
 													</div>
-												</a>
+												</Link>
 											</div>
 										</TableCell>
-
+										{/* Display basic information abour products */}
 										<TableCell align="right">${row.price}</TableCell>
 										<TableCell align="right">{row.ratings}</TableCell>
 										<TableCell align="right">{row.soldUnit}</TableCell>
