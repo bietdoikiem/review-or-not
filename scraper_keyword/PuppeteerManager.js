@@ -218,6 +218,8 @@ try {
 							function wait(ms) {
 								return new Promise((resolve) => setTimeout(() => resolve(), ms));
 							}
+							let commentFilter = document.getElementsByClassName("product-rating-overview__filter--with-comment")[0]
+							await commentFilter.click()
 							let results = [];
 							let pages = document.getElementsByClassName("shopee-icon-button--right");
 							let trackingPage = 1;
